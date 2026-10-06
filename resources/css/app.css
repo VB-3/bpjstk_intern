@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+    
+    body {
+        @apply antialiased text-gray-800;
+        background-color: #f0f4f8;
+        background-image: 
+            radial-gradient(at 0% 0%, rgba(22, 163, 74, 0.07) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(37, 99, 235, 0.05) 0px, transparent 50%);
+        background-attachment: fixed;
+    }
+
+    ::selection {
+        @apply bg-green-500 text-white;
+    }
+
+    /* Data tables: keep cells/headers on one line so horizontal scroll works on small screens */
+    table th,
+    table td {
+        @apply whitespace-nowrap;
+    }
+
+    table td .line-clamp-2 {
+        white-space: normal;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+        @apply bg-transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+        @apply bg-gray-300 rounded-full hover:bg-gray-400 transition-colors duration-200;
+    }
+}
+
+@layer components {
+    /* Glass morphism card */
+    .glass-effect {
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0,0,0,0.04);
+    }
+
+    /* Hover lift effect */
+    .card-hover {
+        @apply transition-all duration-300 ease-out;
+    }
+    .card-hover:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0,0,0,0.06);
+    }
+
+    /* Stat card icon container */
+    .stat-icon {
+        @apply w-14 h-14 rounded-2xl flex items-center justify-center shrink-0;
+    }
+
+    /* Badge pill */
+    .badge {
+        @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold;
+    }
+
+    /* Section heading style */
+    .section-header {
+        @apply flex items-center gap-3 p-6 sm:px-8 border-b border-gray-100/70;
+    }
+
+    /* Page content wrapper */
+    .page-wrapper {
+        @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8;
+    }
+}
