@@ -93,34 +93,6 @@
                             </div>
                         </div>
 
-                        {{-- Lokasi Check-In & Check-Out --}}
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label for="check_in_location" class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">
-                                    Lokasi Check-In (Koordinat)
-                                </label>
-                                <input type="text" id="check_in_location" name="check_in_location"
-                                    value="{{ old('check_in_location', $attendance->check_in_location) }}"
-                                    placeholder="Contoh: -6.2088,106.8456"
-                                    class="w-full border @error('check_in_location') border-red-300 ring-2 ring-red-100 @else border-gray-200 @enderror bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 rounded-xl px-4 py-2.5 text-sm font-medium transition-all outline-none">
-                                @error('check_in_location')
-                                    <p class="mt-1.5 text-xs text-red-500">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div>
-                                <label for="check_out_location" class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">
-                                    Lokasi Check-Out (Koordinat)
-                                </label>
-                                <input type="text" id="check_out_location" name="check_out_location"
-                                    value="{{ old('check_out_location', $attendance->check_out_location) }}"
-                                    placeholder="Contoh: -6.2088,106.8456"
-                                    class="w-full border @error('check_out_location') border-red-300 ring-2 ring-red-100 @else border-gray-200 @enderror bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 rounded-xl px-4 py-2.5 text-sm font-medium transition-all outline-none">
-                                @error('check_out_location')
-                                    <p class="mt-1.5 text-xs text-red-500">{{ $message }}</p>
-                                @enderror
-                            </div>
-                        </div>
 
                         {{-- Action Buttons --}}
                         <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-3 pt-4 border-t border-gray-100">

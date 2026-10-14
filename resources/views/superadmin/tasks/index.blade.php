@@ -163,7 +163,11 @@
 
                                 {{-- Status --}}
                                 <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    @if($task->is_active)
+                                    @if($task->deadline && \Carbon\Carbon::parse($task->deadline)->isPast())
+                                        <span class="badge bg-red-100 text-red-700 border border-red-200 inline-flex items-center gap-1 font-bold">
+                                            Selesai
+                                        </span>
+                                    @elseif($task->is_active)
                                         <span class="badge bg-green-100 text-green-800 border border-green-200 inline-flex items-center gap-1 font-bold">
                                             <span class="w-1.5 h-1.5 rounded-full bg-green-600 animate-pulse"></span>
                                             Aktif

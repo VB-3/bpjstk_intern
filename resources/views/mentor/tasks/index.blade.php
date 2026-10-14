@@ -62,7 +62,9 @@
                                 @forelse($tasks as $task)
                                     <div class="p-5 bg-white rounded-2xl border {{ $task->is_active ? 'border-green-400 shadow-md ring-1 ring-green-400' : 'border-gray-200 shadow-sm' }} transition-all flex items-center justify-between gap-4 relative overflow-hidden">
                                         
-                                        @if($task->is_active)
+                                        @if($task->deadline && \Carbon\Carbon::parse($task->deadline)->isPast())
+                                            <div class="absolute top-0 right-0 bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-wider">Selesai</div>
+                                        @elseif($task->is_active)
                                             <div class="absolute top-0 right-0 bg-green-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-wider">Aktif Saat Ini</div>
                                         @endif
 

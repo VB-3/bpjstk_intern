@@ -19,26 +19,23 @@ class AttendanceController extends Controller
     public function checkIn(Request $request)
     {
         $request->validate([
-            'type' => 'required|in:harian,luar_harian',
+            'type'           => 'required|in:harian,luar_harian',
             'check_in_photo' => 'required',
-            'check_in_location' => 'required',
         ]);
 
-        $image = $request->check_in_photo;
+        $image      = $request->check_in_photo;
         $imageParts = explode(";base64,", $image);
-        $imageTypeAux = explode("image/", $imageParts[0]);
-        $imageType = $imageTypeAux[1];
+        $imageType  = explode("image/", $imageParts[0])[1];
         $imageBase64 = base64_decode($imageParts[1]);
-        $fileName = 'checkin_' . auth()->id() . '_' . time() . '.' . $imageType;
+        $fileName   = 'checkin_' . auth()->id() . '_' . time() . '.' . $imageType;
         Storage::disk('public')->put('attendances/' . $fileName, $imageBase64);
 
         Attendance::create([
-            'user_id' => auth()->id(),
-            'date' => date('Y-m-d'),
-            'type' => $request->type,
-            'check_in_time' => now(),
+            'user_id'        => auth()->id(),
+            'date'           => date('Y-m-d'),
+            'type'           => $request->type,
+            'check_in_time'  => now(),
             'check_in_photo' => 'attendances/' . $fileName,
-            'check_in_location' => $request->check_in_location,
         ]);
 
         return redirect()->back()->with('success', 'Check-in berhasil!');
@@ -64,21 +61,18 @@ class AttendanceController extends Controller
 
         $request->validate([
             'check_out_photo' => 'required',
-            'check_out_location' => 'required',
         ]);
 
-        $image = $request->check_out_photo;
-        $imageParts = explode(";base64,", $image);
-        $imageTypeAux = explode("image/", $imageParts[0]);
-        $imageType = $imageTypeAux[1];
+        $image       = $request->check_out_photo;
+        $imageParts  = explode(";base64,", $image);
+        $imageType   = explode("image/", $imageParts[0])[1];
         $imageBase64 = base64_decode($imageParts[1]);
-        $fileName = 'checkout_' . auth()->id() . '_' . time() . '.' . $imageType;
+        $fileName    = 'checkout_' . auth()->id() . '_' . time() . '.' . $imageType;
         Storage::disk('public')->put('attendances/' . $fileName, $imageBase64);
 
         $attendance->update([
-            'check_out_time' => now(),
+            'check_out_time'  => now(),
             'check_out_photo' => 'attendances/' . $fileName,
-            'check_out_location' => $request->check_out_location,
         ]);
 
         return redirect()->back()->with('success', 'Check-out berhasil!');

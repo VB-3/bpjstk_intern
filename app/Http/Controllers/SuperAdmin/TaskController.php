@@ -21,7 +21,7 @@ class TaskController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        $submissions = TaskSubmission::with('user')
+        $submissions = TaskSubmission::with('user', 'assignedTask')
             ->orderBy('submitted_at', 'desc')
             ->paginate(10, ['*'], 'submissions_page');
 

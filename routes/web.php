@@ -20,9 +20,33 @@ Route::middleware(['auth', 'verified'])->group(function () {
         $attendances = \App\Models\Attendance::where('user_id', auth()->id())->orderBy('date', 'desc')->take(5)->get();
         $tasks = \App\Models\TaskSubmission::where('user_id', auth()->id())->orderBy('submitted_at', 'desc')->take(5)->get();
         $totalBpu = \App\Models\Todo::where('user_id', auth()->id())->sum('bpu_achievement');
+
+        // Leaderboard BPU
+        $bpuLeaderboard = \App\Models\User::where('role', 'intern')
+            ->withSum('todos', 'bpu_achievement')
+            ->orderByDesc('todos_sum_bpu_achievement')
+            ->get()
+            ->map(function ($user) {
+                $user->total_bpu = $user->todos_sum_bpu_achievement ?? 0;
+                return $user;
+            });
+        $bpuTop3 = $bpuLeaderboard->take(3);
         
-        return view('dashboard', compact('attendances', 'tasks', 'totalBpu'));
+        return view('dashboard', compact('attendances', 'tasks', 'totalBpu', 'bpuLeaderboard', 'bpuTop3'));
     })->name('dashboard');
+
+    // Route leaderboard BPU (accessible oleh semua role)
+    Route::get('/leaderboard/bpu', function () {
+        $bpuLeaderboard = \App\Models\User::where('role', 'intern')
+            ->withSum('todos', 'bpu_achievement')
+            ->orderByDesc('todos_sum_bpu_achievement')
+            ->get()
+            ->map(function ($user) {
+                $user->total_bpu = $user->todos_sum_bpu_achievement ?? 0;
+                return $user;
+            });
+        return response()->json($bpuLeaderboard->map(fn($u) => ['name' => $u->name, 'total_bpu' => $u->total_bpu]));
+    })->name('leaderboard.bpu');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

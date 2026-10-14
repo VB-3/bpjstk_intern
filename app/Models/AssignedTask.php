@@ -25,6 +25,12 @@ class AssignedTask extends Model
         return $this->belongsTo(\App\Models\User::class, 'created_by');
     }
 
+    public function submissions()
+    {
+        return $this->hasMany(TaskSubmission::class);
+    }
+
+    public function isExpired()   { return $this->deadline && $this->deadline->isPast(); }
     public function isPending()   { return $this->status === 'pending'; }
     public function isApproved()  { return $this->status === 'approved'; }
     public function isRejected()  { return $this->status === 'rejected'; }

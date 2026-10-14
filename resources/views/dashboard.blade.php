@@ -40,7 +40,36 @@
         </div>
 
         {{-- ── Stats Row ─────────────────────────────────────────────────── --}}
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {{-- Leaderboard BPU Card --}}
+            <button type="button" onclick="document.getElementById('modalLeaderboard').classList.remove('hidden')"
+                    class="glass-effect rounded-2xl p-5 sm:p-6 card-hover flex flex-col justify-between group w-full text-left cursor-pointer border border-amber-100/60 hover:border-amber-300 transition-all">
+                <div class="flex items-center justify-between w-full mb-2.5">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-base leading-none">🏆</span>
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Leaderboard BPU</p>
+                    </div>
+                    <span class="text-[11px] font-bold text-amber-600 group-hover:text-amber-700 transition-colors flex items-center gap-0.5">
+                        Lihat Semua <span class="group-hover:translate-x-0.5 transition-transform duration-200">→</span>
+                    </span>
+                </div>
+                <div class="w-full space-y-1.5">
+                    @forelse($bpuTop3 as $idx => $top)
+                        <div class="flex items-center justify-between text-xs py-1.5 px-2.5 rounded-xl bg-gray-50/90 group-hover:bg-amber-50/60 transition-colors">
+                            <span class="font-semibold text-gray-800 truncate flex items-center gap-2">
+                                <span class="text-sm leading-none">{{ ['🥇','🥈','🥉'][$idx] }}</span>
+                                <span class="truncate">{{ $top->name }}</span>
+                            </span>
+                            <span class="font-extrabold text-amber-700 shrink-0 ml-2 bg-white border border-amber-200/70 px-2 py-0.5 rounded-lg text-[11px]">
+                                {{ $top->total_bpu }} <span class="text-[9px] font-semibold text-gray-400">BPU</span>
+                            </span>
+                        </div>
+                    @empty
+                        <p class="text-xs text-gray-400 py-1">Belum ada data BPU.</p>
+                    @endforelse
+                </div>
+            </button>
+
             {{-- Total BPU --}}
             <div class="glass-effect rounded-2xl p-6 card-hover flex items-center gap-5">
                 <div class="stat-icon bg-blue-50 text-blue-600">
@@ -77,6 +106,85 @@
                 </div>
             </a>
         </div>
+
+        {{-- ── Modal Leaderboard BPU ───────────────────────────────────────── --}}
+        <div id="modalLeaderboard"
+             class="hidden fixed inset-0 z-50 flex items-center justify-center p-4"
+             onclick="if(event.target===this) this.classList.add('hidden')">
+            {{-- Backdrop --}}
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+            {{-- Modal Box --}}
+            <div class="relative z-10 bg-white rounded-3xl shadow-2xl w-full max-w-md max-h-[85vh] flex flex-col overflow-hidden">
+                {{-- Header --}}
+                <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100"
+                     style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-xl">
+                            🏆
+                        </div>
+                        <div>
+                            <h3 class="text-base font-extrabold text-white">Leaderboard BPU</h3>
+                            <p class="text-xs text-yellow-100">Peringkat peserta berdasarkan total BPU</p>
+                        </div>
+                    </div>
+                    <button onclick="document.getElementById('modalLeaderboard').classList.add('hidden')"
+                            class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                {{-- Body: daftar peserta --}}
+                <div class="overflow-y-auto flex-1 p-4 space-y-2">
+                    @forelse($bpuLeaderboard as $rank => $peserta)
+                        @php
+                            $medals = ['🥇','🥈','🥉'];
+                            $medal = $medals[$rank] ?? null;
+                            $isTop = $rank < 3;
+                        @endphp
+                        <div class="flex items-center gap-4 rounded-2xl px-4 py-3
+                            {{ $isTop ? 'bg-yellow-50 border border-yellow-200' : 'bg-gray-50 border border-gray-100' }}">
+                            {{-- Rank --}}
+                            <div class="w-8 text-center shrink-0">
+                                @if($medal)
+                                    <span class="text-xl">{{ $medal }}</span>
+                                @else
+                                    <span class="text-sm font-bold text-gray-400">#{{ $rank + 1 }}</span>
+                                @endif
+                            </div>
+                            {{-- Avatar --}}
+                            <div class="w-9 h-9 rounded-xl {{ $isTop ? 'bg-yellow-200 text-yellow-800' : 'bg-gray-200 text-gray-600' }} flex items-center justify-center font-extrabold text-sm shrink-0">
+                                {{ strtoupper(substr($peserta->name, 0, 1)) }}
+                            </div>
+                            {{-- Name --}}
+                            <div class="flex-1 min-w-0">
+                                <p class="font-bold text-gray-900 text-sm truncate">{{ $peserta->name }}</p>
+                                @if($rank === 0)
+                                    <p class="text-[10px] font-bold text-yellow-600 uppercase tracking-wider">Peringkat Pertama 🎉</p>
+                                @endif
+                            </div>
+                            {{-- BPU --}}
+                            <div class="text-right shrink-0">
+                                <p class="text-xl font-extrabold {{ $isTop ? 'text-yellow-600' : 'text-gray-700' }}">{{ $peserta->total_bpu }}</p>
+                                <p class="text-[10px] text-gray-400 font-medium">BPU</p>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center py-10">
+                            <p class="text-gray-400 text-sm">Belum ada data BPU peserta.</p>
+                        </div>
+                    @endforelse
+                </div>
+
+                {{-- Footer --}}
+                <div class="px-6 py-4 border-t border-gray-100 text-center">
+                    <p class="text-xs text-gray-400">Data diperbarui secara real-time dari pencatatan To-Do harian.</p>
+                </div>
+            </div>
+        </div>
+
 
         {{-- ── History Cards ──────────────────────────────────────────────── --}}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">

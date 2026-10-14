@@ -36,21 +36,17 @@ class AttendanceController extends Controller
     public function update(Request $request, Attendance $attendance)
     {
         $request->validate([
-            'date' => 'required|date',
-            'type' => 'required|in:harian,luar_harian',
-            'check_in_time' => 'nullable|date',
+            'date'           => 'required|date',
+            'type'           => 'required|in:harian,luar_harian',
+            'check_in_time'  => 'nullable|date',
             'check_out_time' => 'nullable|date',
-            'check_in_location' => 'nullable|string',
-            'check_out_location' => 'nullable|string',
         ]);
 
         $attendance->update([
-            'date' => $request->date,
-            'type' => $request->type,
-            'check_in_time' => $request->check_in_time,
+            'date'           => $request->date,
+            'type'           => $request->type,
+            'check_in_time'  => $request->check_in_time,
             'check_out_time' => $request->check_out_time,
-            'check_in_location' => $request->check_in_location,
-            'check_out_location' => $request->check_out_location,
         ]);
 
         return redirect()->route('superadmin.attendances.index')->with('success', 'Data absensi berhasil diperbarui.');

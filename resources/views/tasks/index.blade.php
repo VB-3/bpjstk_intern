@@ -42,20 +42,44 @@
                             </div>
 
                             <div class="border-t border-gray-100 pt-5">
-                                <form method="POST" action="{{ route('tasks.store') }}" class="space-y-4">
-                                    @csrf
-                                    <div>
-                                        <label for="link" class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Tautan / Link Pengumpulan</label>
-                                        <input id="link" name="link" type="url" required placeholder="https://..."
-                                            class="w-full border border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl px-4 py-2.5 text-sm font-medium transition-all outline-none">
+                                @if($alreadySubmitted)
+                                    {{-- Sudah dikumpulkan: tampilkan notifikasi, sembunyikan form --}}
+                                    <div class="flex flex-col items-center text-center gap-3 py-4">
+                                        <div class="w-14 h-14 rounded-2xl bg-green-100 flex items-center justify-center">
+                                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="font-extrabold text-green-700 text-base">Tugas Sudah Dikumpulkan!</p>
+                                            <p class="text-sm text-gray-400 mt-1">Anda sudah mengumpulkan tugas ini. Tunggu tugas berikutnya dari mentor.</p>
+                                        </div>
                                     </div>
-                                    <button type="submit"
-                                        class="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm text-white shadow-md shadow-blue-200 transition-all"
-                                        style="background:linear-gradient(135deg,#60a5fa,#2563eb)">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-                                        Kirim Tugas Sekarang
-                                    </button>
-                                </form>
+                                @else
+                                    {{-- Belum submit: tampilkan form --}}
+                                    @if(session('error'))
+                                        <div class="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 font-semibold">
+                                            {{ session('error') }}
+                                        </div>
+                                    @endif
+                                    <form method="POST" action="{{ route('tasks.store') }}" class="space-y-4">
+                                        @csrf
+                                        <div>
+                                            <label for="link" class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Tautan / Link Pengumpulan</label>
+                                            <input id="link" name="link" type="url" required placeholder="https://..."
+                                                class="w-full border border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl px-4 py-2.5 text-sm font-medium transition-all outline-none">
+                                            @error('link')
+                                                <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                        <button type="submit"
+                                            class="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm text-white shadow-md shadow-blue-200 transition-all"
+                                            style="background:linear-gradient(135deg,#60a5fa,#2563eb)">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                                            Kirim Tugas Sekarang
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         @else
                             <div class="text-center py-8">
@@ -64,6 +88,13 @@
                                 </div>
                                 <h3 class="text-base font-bold text-gray-700 mb-1">Belum Ada Tugas</h3>
                                 <p class="text-sm text-gray-400">Tidak ada tugas aktif saat ini.</p>
+                            </div>
+                        @endif
+
+                        {{-- Flash success message --}}
+                        @if(session('success'))
+                            <div class="mt-4 px-4 py-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-700 font-semibold">
+                                {{ session('success') }}
                             </div>
                         @endif
                     </div>
@@ -89,6 +120,12 @@
                                 <div class="bg-white rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-md transition-all p-4 flex items-center gap-4">
                                     {{-- info --}}
                                     <div class="flex-1 min-w-0">
+                                        {{-- Nama Tugas --}}
+                                        @if($task->assignedTask)
+                                            <p class="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-100 rounded-lg px-2.5 py-1 inline-block mb-2">
+                                                📋 {{ $task->assignedTask->title }}
+                                            </p>
+                                        @endif
                                         <div class="flex flex-wrap items-center gap-2 mb-2">
                                             <span class="badge bg-blue-100 text-blue-800">
                                                 {{ \Carbon\Carbon::parse($task->submitted_at)->translatedFormat('l, d F Y') }}

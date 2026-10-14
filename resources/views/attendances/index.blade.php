@@ -22,7 +22,7 @@
                             </div>
                             <div>
                                 <h2 class="text-lg font-extrabold text-white">Form Absensi</h2>
-                                <p class="text-green-200 text-xs mt-0.5">Foto & lokasi otomatis terdeteksi</p>
+                                <p class="text-green-200 text-xs mt-0.5">Foto selfie otomatis terdeteksi</p>
                             </div>
                         </div>
                     </div>
@@ -35,11 +35,19 @@
                                 <video id="webcam" autoplay playsinline class="w-full h-full object-cover"></video>
                             </div>
                             <canvas id="canvas" class="hidden"></canvas>
-                            <div class="mt-3 flex items-center justify-center gap-2 text-xs font-semibold text-gray-500 bg-gray-50 border border-gray-100 rounded-xl px-4 py-2">
-                                <svg class="w-3.5 h-3.5 text-green-500 animate-pulse shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                <span id="location-status">Mencari lokasi...</span>
-                            </div>
                         </div>
+
+                        {{-- Flash messages --}}
+                        @if(session('success'))
+                            <div class="mb-4 px-4 py-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-700 font-semibold">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+                        @if(session('error'))
+                            <div class="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 font-semibold">
+                                {{ session('error') }}
+                            </div>
+                        @endif
 
                         {{-- form states --}}
                         @if(!$todayAttendance)
@@ -54,7 +62,6 @@
                                     </select>
                                 </div>
                                 <input type="hidden" name="check_in_photo" id="check_in_photo">
-                                <input type="hidden" name="check_in_location" id="check_in_location">
                                 <button type="button"
                                     onclick="takeSnapshotAndSubmit('checkin-form','check_in_photo')"
                                     class="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm text-white shadow-md shadow-green-200 transition-all"
@@ -74,7 +81,6 @@
                             <form method="POST" action="{{ route('attendances.checkout') }}" id="checkout-form">
                                 @csrf
                                 <input type="hidden" name="check_out_photo" id="check_out_photo">
-                                <input type="hidden" name="check_out_location" id="check_out_location">
                                 <button type="button"
                                     onclick="takeSnapshotAndSubmit('checkout-form','check_out_photo')"
                                     class="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm text-white shadow-md shadow-red-200 transition-all"
@@ -171,10 +177,8 @@
     </div>
 
     <script>
-        const video = document.getElementById('webcam');
+        const video  = document.getElementById('webcam');
         const canvas = document.getElementById('canvas');
-        const locationStatus = document.getElementById('location-status');
-        let currentLocation = '';
 
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             navigator.mediaDevices.getUserMedia({ video: true })
@@ -182,22 +186,9 @@
                 .catch(() => console.log("Webcam tidak tersedia."));
         }
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                currentLocation = position.coords.latitude + "," + position.coords.longitude;
-                locationStatus.innerText = "Lokasi terdeteksi ✓";
-                locationStatus.closest('div').classList.add('text-green-600');
-                if(document.getElementById('check_in_location'))  document.getElementById('check_in_location').value  = currentLocation;
-                if(document.getElementById('check_out_location')) document.getElementById('check_out_location').value = currentLocation;
-            }, function() {
-                locationStatus.innerText = "Gagal mendapatkan lokasi — izinkan di browser.";
-                locationStatus.closest('div').classList.add('text-red-500');
-            });
-        }
-
         function takeSnapshotAndSubmit(formId, photoInputId) {
-            if(!currentLocation) {
-                alert("Sistem masih menunggu deteksi lokasi. Pastikan Anda mengizinkan akses lokasi di browser.");
+            if (!video.videoWidth || !video.videoHeight) {
+                alert("Kamera belum aktif atau belum siap. Pastikan izin kamera telah diberikan.");
                 return;
             }
             const ctx = canvas.getContext('2d');

@@ -8,6 +8,7 @@ class TaskSubmission extends Model
 {
     protected $fillable = [
         'user_id',
+        'assigned_task_id',
         'link',
         'submitted_at',
     ];
@@ -19,5 +20,10 @@ class TaskSubmission extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function assignedTask()
+    {
+        return $this->belongsTo(AssignedTask::class);
     }
 }

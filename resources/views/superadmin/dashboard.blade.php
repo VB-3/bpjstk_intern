@@ -94,6 +94,35 @@
         <div>
             <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Statistik Aktivitas & Kinerja</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                {{-- Total BPU / Leaderboard Card --}}
+                <button type="button" onclick="document.getElementById('modalLeaderboard').classList.remove('hidden')"
+                        class="glass-effect rounded-2xl p-5 card-hover flex flex-col justify-between group w-full text-left cursor-pointer border border-amber-100/60 hover:border-amber-300 transition-all">
+                    <div class="flex items-center justify-between w-full mb-2">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-base leading-none">🏆</span>
+                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Leaderboard BPU</p>
+                        </div>
+                        <span class="text-[10px] font-bold text-amber-600 group-hover:text-amber-700 transition-colors flex items-center gap-0.5">
+                            Lihat Semua <span class="group-hover:translate-x-0.5 transition-transform duration-200">→</span>
+                        </span>
+                    </div>
+                    <div class="w-full space-y-1.5">
+                        @forelse($bpuTop3 as $idx => $top)
+                            <div class="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-gray-50/90 group-hover:bg-amber-50/60 transition-colors">
+                                <span class="font-semibold text-gray-800 truncate flex items-center gap-1.5">
+                                    <span class="text-xs leading-none">{{ ['🥇','🥈','🥉'][$idx] }}</span>
+                                    <span class="truncate">{{ $top->name }}</span>
+                                </span>
+                                <span class="font-extrabold text-amber-700 shrink-0 ml-1.5 bg-white border border-amber-200/70 px-1.5 py-0.5 rounded-md text-[10px]">
+                                    {{ $top->total_bpu }} <span class="text-[9px] font-semibold text-gray-400">BPU</span>
+                                </span>
+                            </div>
+                        @empty
+                            <p class="text-xs text-gray-400 py-1">Belum ada data BPU.</p>
+                        @endforelse
+                    </div>
+                </button>
+
                 {{-- Hadir Hari Ini --}}
                 <div class="glass-effect rounded-2xl p-5 card-hover flex items-center gap-4">
                     <div class="stat-icon bg-emerald-50 text-emerald-600">
@@ -132,19 +161,232 @@
                         <p class="text-3xl font-extrabold text-gray-900 mt-0.5">{{ $totalAssignedTasks }}</p>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                {{-- Total BPU --}}
-                <div class="glass-effect rounded-2xl p-5 card-hover flex items-center gap-4">
-                    <div class="stat-icon bg-orange-50 text-orange-600">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                        </svg>
+        {{-- ── Modal Leaderboard BPU ───────────────────────────────────────── --}}
+        <div id="modalLeaderboard"
+             class="hidden fixed inset-0 z-50 flex items-center justify-center p-4"
+             onclick="if(event.target===this) this.classList.add('hidden')">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+            <div class="relative z-10 bg-white rounded-3xl shadow-2xl w-full max-w-md max-h-[85vh] flex flex-col overflow-hidden">
+                {{-- Header --}}
+                <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100"
+                     style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-xl">
+                            🏆
+                        </div>
+                        <div>
+                            <h3 class="text-base font-extrabold text-white">Leaderboard BPU Peserta Magang</h3>
+                            <p class="text-xs text-yellow-100">Diurutkan dari BPU terbanyak</p>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight">Total BPU</p>
-                        <p class="text-3xl font-extrabold text-gray-900 mt-0.5">{{ $totalBpu }}</p>
+                    <button onclick="document.getElementById('modalLeaderboard').classList.add('hidden')"
+                            class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                {{-- Body --}}
+                <div class="overflow-y-auto flex-1 p-4 space-y-2">
+                    @forelse($bpuLeaderboard as $rank => $peserta)
+                        @php
+                            $medals = ['🥇','🥈','🥉'];
+                            $medal = $medals[$rank] ?? null;
+                            $isTop = $rank < 3;
+                        @endphp
+                        <div class="flex items-center gap-4 rounded-2xl px-4 py-3
+                            {{ $isTop ? 'bg-yellow-50 border border-yellow-200' : 'bg-gray-50 border border-gray-100' }}">
+                            <div class="w-8 text-center shrink-0">
+                                @if($medal)
+                                    <span class="text-xl">{{ $medal }}</span>
+                                @else
+                                    <span class="text-sm font-bold text-gray-400">#{{ $rank + 1 }}</span>
+                                @endif
+                            </div>
+                            <div class="w-9 h-9 rounded-xl {{ $isTop ? 'bg-yellow-200 text-yellow-800' : 'bg-gray-200 text-gray-600' }} flex items-center justify-center font-extrabold text-sm shrink-0">
+                                {{ strtoupper(substr($peserta->name, 0, 1)) }}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="font-bold text-gray-900 text-sm truncate">{{ $peserta->name }}</p>
+                                <p class="text-xs text-gray-400 truncate">{{ $peserta->email }}</p>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <p class="text-xl font-extrabold {{ $isTop ? 'text-yellow-600' : 'text-gray-700' }}">{{ $peserta->total_bpu }}</p>
+                                <p class="text-[10px] text-gray-400 font-medium">BPU</p>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center py-10">
+                            <p class="text-gray-400 text-sm">Belum ada data BPU peserta magang.</p>
+                        </div>
+                    @endforelse
+                </div>
+
+                {{-- Footer --}}
+                <div class="px-6 py-4 border-t border-gray-100 text-center">
+                    <p class="text-xs text-gray-400">Total BPU seluruh peserta: <strong class="text-gray-700">{{ $totalBpu }}</strong> orang</p>
+                </div>
+            </div>
+        </div>
+
+
+
+        {{-- ── Riwayat Tugas: Tugas Aktif vs Tugas Selesai ──────────────── --}}
+        <div>
+            <div class="flex items-center justify-between mb-3">
+                <div>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Riwayat & Status Tugas</h3>
+                    <p class="text-xs text-gray-500 mt-0.5">Pemantauan tugas aktif yang sedang berjalan dan tugas yang telah melewati batas tanggal</p>
+                </div>
+                <a href="{{ route('superadmin.tasks.index') }}" class="text-xs font-bold text-green-700 bg-green-50 hover:bg-green-100 border border-green-200 px-3 py-1.5 rounded-lg transition-colors">
+                    Kelola Semua Tugas →
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                {{-- 🟢 Card Tugas Aktif --}}
+                <div class="glass-effect rounded-3xl overflow-hidden shadow-md flex flex-col border border-emerald-100/60">
+                    <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100/70 bg-gradient-to-r from-emerald-50/70 to-transparent">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-extrabold text-gray-900 flex items-center gap-2">
+                                    Tugas Aktif
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800">
+                                        {{ $activeTasks->count() }} Berjalan
+                                    </span>
+                                </h3>
+                                <p class="text-xs text-gray-400">Tugas yang masih berjalan dan belum melewati batas waktu</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-5 flex-1 divide-y divide-gray-100">
+                        @forelse($activeTasks as $task)
+                            <div class="py-3.5 first:pt-0 last:pb-0">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="font-extrabold text-gray-900 text-sm truncate">{{ $task->title }}</h4>
+                                        @if($task->description)
+                                            <p class="text-xs text-gray-500 line-clamp-1 mt-0.5">{{ $task->description }}</p>
+                                        @endif
+                                        <div class="flex flex-wrap items-center gap-2 mt-2">
+                                            @if($task->deadline)
+                                                <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md">
+                                                    <svg class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                    Tenggat: {{ \Carbon\Carbon::parse($task->deadline)->translatedFormat('d M Y, H:i') }} WIB ({{ \Carbon\Carbon::parse($task->deadline)->diffForHumans() }})
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md">
+                                                    Tanpa batas tenggat
+                                                </span>
+                                            @endif
+                                            <span class="inline-flex items-center gap-1 text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200/70 px-2 py-0.5 rounded-md">
+                                                <svg class="w-3 h-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                                {{ $task->submissions_count }} Pengumpulan
+                                            </span>
+                                            <span class="text-[10px] text-gray-400">
+                                                Oleh: {{ $task->creator->name ?? 'Super Admin' }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <a href="{{ route('superadmin.tasks.edit', $task) }}" class="p-2 rounded-xl text-gray-400 hover:text-green-700 hover:bg-green-50 transition-colors shrink-0" title="Edit Tugas">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                    </a>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="text-center py-8">
+                                <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center mx-auto mb-2">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                                </div>
+                                <p class="text-sm font-bold text-gray-700">Tidak ada tugas aktif</p>
+                                <p class="text-xs text-gray-400 mt-0.5">Semua tugas saat ini telah melewati tenggat atau belum ada tugas baru.</p>
+                                <a href="{{ route('superadmin.tasks.create') }}" class="inline-flex items-center gap-1.5 mt-3 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-lg transition-colors">
+                                    + Buat Tugas Baru
+                                </a>
+                            </div>
+                        @endforelse
                     </div>
                 </div>
+
+                {{-- ⚪ Card Tugas Selesai (Melewati Batas Tanggal) --}}
+                <div class="glass-effect rounded-3xl overflow-hidden shadow-md flex flex-col border border-gray-200/70">
+                    <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100/70 bg-gradient-to-r from-gray-50/80 to-transparent">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-gray-100 text-gray-600 flex items-center justify-center font-bold">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-extrabold text-gray-900 flex items-center gap-2">
+                                    Tugas Selesai
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-gray-100 text-gray-700">
+                                        {{ $completedTasks->count() }} Selesai
+                                    </span>
+                                </h3>
+                                <p class="text-xs text-gray-400">Tugas yang telah melewati batas tanggal atau dinonaktifkan</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-5 flex-1 divide-y divide-gray-100">
+                        @forelse($completedTasks as $task)
+                            <div class="py-3.5 first:pt-0 last:pb-0">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="font-extrabold text-gray-700 text-sm truncate">{{ $task->title }}</h4>
+                                        @if($task->description)
+                                            <p class="text-xs text-gray-400 line-clamp-1 mt-0.5">{{ $task->description }}</p>
+                                        @endif
+                                        <div class="flex flex-wrap items-center gap-2 mt-2">
+                                            @if($task->deadline)
+                                                <span class="inline-flex items-center gap-1 text-[10px] font-bold text-red-700 bg-red-50 border border-red-200/80 px-2 py-0.5 rounded-md">
+                                                    <svg class="w-3 h-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                    Tenggat Berakhir: {{ \Carbon\Carbon::parse($task->deadline)->translatedFormat('d M Y') }} ({{ \Carbon\Carbon::parse($task->deadline)->diffForHumans() }})
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md">
+                                                    Selesai
+                                                </span>
+                                            @endif
+                                            <span class="inline-flex items-center gap-1 text-[10px] font-bold text-gray-700 bg-gray-100 border border-gray-200 px-2 py-0.5 rounded-md">
+                                                <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                                {{ $task->submissions_count }} Pengumpulan
+                                            </span>
+                                            <span class="text-[10px] text-gray-400">
+                                                Oleh: {{ $task->creator->name ?? 'Super Admin' }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <a href="{{ route('superadmin.tasks.edit', $task) }}" class="p-2 rounded-xl text-gray-400 hover:text-blue-700 hover:bg-blue-50 transition-colors shrink-0" title="Detail / Edit">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    </a>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="text-center py-8">
+                                <div class="w-12 h-12 rounded-2xl bg-gray-100 text-gray-400 flex items-center justify-center mx-auto mb-2">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                                </div>
+                                <p class="text-sm font-bold text-gray-700">Belum ada tugas selesai</p>
+                                <p class="text-xs text-gray-400 mt-0.5">Tugas yang telah melewati tanggal tenggat akan muncul di sini.</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+
             </div>
         </div>
 
