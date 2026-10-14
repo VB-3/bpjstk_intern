@@ -42,11 +42,6 @@ class TaskController extends Controller
             'is_active' => 'nullable|boolean',
         ]);
 
-        if ($request->is_active) {
-            // Nonaktifkan tugas lain yang sedang aktif
-            AssignedTask::where('is_active', true)->update(['is_active' => false]);
-        }
-
         AssignedTask::create([
             'title' => $request->title,
             'description' => $request->description,
@@ -71,11 +66,6 @@ class TaskController extends Controller
             'is_active' => 'nullable|boolean',
         ]);
 
-        if ($request->is_active && !$task->is_active) {
-            // Nonaktifkan tugas lain jika tugas ini diaktifkan
-            AssignedTask::where('is_active', true)->where('id', '!=', $task->id)->update(['is_active' => false]);
-        }
-
         $task->update([
             'title' => $request->title,
             'description' => $request->description,
@@ -94,9 +84,6 @@ class TaskController extends Controller
 
     public function approve(AssignedTask $task)
     {
-        // Nonaktifkan tugas lain yang sedang aktif
-        AssignedTask::where('is_active', true)->where('id', '!=', $task->id)->update(['is_active' => false]);
-
         $task->update([
             'status'    => 'approved',
             'is_active' => true,

@@ -10,53 +10,50 @@ class TaskSubmissionController extends Controller
 {
     public function index()
     {
-        // Otomatis nonaktifkan tugas yang sudah melewati batas tanggal tenggat
-        AssignedTask::where('is_active', true)
-            ->whereNotNull('deadline')
-            ->where('deadline', '<', now())
-            ->update(['is_active' => false]);
-
-        $ongoingTask = AssignedTask::where('is_active', true)
+        // Ambil semua tugas yang aktif dan belum melewati deadline
+        $ongoingTasks = AssignedTask::where('is_active', true)
+            ->where('status', 'approved')
             ->where(function ($q) {
                 $q->whereNull('deadline')->orWhere('deadline', '>=', now());
             })
-            ->first();
+            ->orderBy('deadline')
+            ->get();
 
-        // Cek apakah user sudah submit tugas aktif ini
-        $alreadySubmitted = false;
-        if ($ongoingTask) {
-            $alreadySubmitted = TaskSubmission::where('user_id', auth()->id())
-                ->where('assigned_task_id', $ongoingTask->id)
-                ->exists();
-        }
+        // Tandai tugas mana saja yang sudah disubmit user ini
+        $submittedTaskIds = TaskSubmission::where('user_id', auth()->id())
+            ->pluck('assigned_task_id')
+            ->toArray();
 
         $tasks = TaskSubmission::where('user_id', auth()->id())
             ->with('assignedTask')
             ->orderBy('submitted_at', 'desc')
             ->paginate(4);
 
-        return view('tasks.index', compact('tasks', 'ongoingTask', 'alreadySubmitted'));
+        return view('tasks.index', compact('tasks', 'ongoingTasks', 'submittedTaskIds'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
+            'assigned_task_id' => 'required|exists:assigned_tasks,id',
             'link' => 'required|url',
         ]);
 
-        $ongoingTask = AssignedTask::where('is_active', true)
+        $task = AssignedTask::where('id', $request->assigned_task_id)
+            ->where('is_active', true)
+            ->where('status', 'approved')
             ->where(function ($q) {
                 $q->whereNull('deadline')->orWhere('deadline', '>=', now());
             })
             ->first();
 
-        if (!$ongoingTask) {
-            return redirect()->back()->with('error', 'Tidak ada tugas aktif saat ini atau tenggat waktu telah berakhir.');
+        if (!$task) {
+            return redirect()->back()->with('error', 'Tugas tidak ditemukan, sudah tidak aktif, atau tenggat waktu telah berakhir.');
         }
 
         // Cegah double submission untuk tugas yang sama
         $alreadySubmitted = TaskSubmission::where('user_id', auth()->id())
-            ->where('assigned_task_id', $ongoingTask->id)
+            ->where('assigned_task_id', $task->id)
             ->exists();
 
         if ($alreadySubmitted) {
@@ -65,11 +62,11 @@ class TaskSubmissionController extends Controller
 
         TaskSubmission::create([
             'user_id'          => auth()->id(),
-            'assigned_task_id' => $ongoingTask->id,
+            'assigned_task_id' => $task->id,
             'link'             => $request->link,
             'submitted_at'     => now(),
         ]);
 
-        return redirect()->back()->with('success', 'Tugas berhasil dikumpulkan!');
+        return redirect()->back()->with('success', 'Tugas "' . $task->title . '" berhasil dikumpulkan!');
     }
 }
