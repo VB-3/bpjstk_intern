@@ -24,7 +24,7 @@
                             <div>
                                 <h2 class="text-lg font-extrabold text-white">Tugas Aktif</h2>
                                 <p class="text-blue-200 text-xs mt-0.5">
-                                    {{ $ongoingTasks->count() }} tugas sedang berlangsung
+                                    {{ $ongoingTasks->whereNotIn('id', $submittedTaskIds)->count() }} tugas menunggu pengumpulan
                                 </p>
                             </div>
                         </div>
@@ -45,6 +45,7 @@
 
                 @forelse($ongoingTasks as $ongoingTask)
                     @php $alreadySubmitted = in_array($ongoingTask->id, $submittedTaskIds); @endphp
+                    @if(!$alreadySubmitted)
                     <div class="glass-effect rounded-3xl overflow-hidden shadow-md bg-white/90">
                         <div class="p-6">
                             <div class="mb-4">
@@ -59,38 +60,25 @@
                             </div>
 
                             <div class="border-t border-gray-100 pt-4">
-                                @if($alreadySubmitted)
-                                    <div class="flex flex-col items-center text-center gap-3 py-4">
-                                        <div class="w-12 h-12 rounded-2xl bg-green-100 flex items-center justify-center">
-                                            <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <p class="font-extrabold text-green-700 text-sm">Sudah Dikumpulkan!</p>
-                                            <p class="text-xs text-gray-400 mt-0.5">Tugas ini telah dikumpulkan.</p>
-                                        </div>
+                                <form method="POST" action="{{ route('tasks.store') }}" class="space-y-3">
+                                    @csrf
+                                    <input type="hidden" name="assigned_task_id" value="{{ $ongoingTask->id }}">
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Tautan / Link Pengumpulan</label>
+                                        <input name="link" type="url" required placeholder="https://..."
+                                            class="w-full border border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl px-4 py-2.5 text-sm font-medium transition-all outline-none">
                                     </div>
-                                @else
-                                    <form method="POST" action="{{ route('tasks.store') }}" class="space-y-3">
-                                        @csrf
-                                        <input type="hidden" name="assigned_task_id" value="{{ $ongoingTask->id }}">
-                                        <div>
-                                            <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Tautan / Link Pengumpulan</label>
-                                            <input name="link" type="url" required placeholder="https://..."
-                                                class="w-full border border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl px-4 py-2.5 text-sm font-medium transition-all outline-none">
-                                        </div>
-                                        <button type="submit"
-                                            class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold text-sm text-white shadow-md shadow-blue-200 transition-all"
-                                            style="background:linear-gradient(135deg,#60a5fa,#2563eb)">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-                                            Kirim Tugas
-                                        </button>
-                                    </form>
-                                @endif
+                                    <button type="submit"
+                                        class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold text-sm text-white shadow-md shadow-blue-200 transition-all"
+                                        style="background:linear-gradient(135deg,#60a5fa,#2563eb)">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                                        Kirim Tugas
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
+                    @endif
                 @empty
                     <div class="glass-effect rounded-3xl overflow-hidden shadow-md bg-white/90">
                         <div class="p-6 text-center py-8">
