@@ -36,17 +36,19 @@ class TaskController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|string|max:255',
+            'title'       => 'required|string|max:255',
             'description' => 'nullable|string',
-            'deadline' => 'nullable|date',
-            'is_active' => 'nullable|boolean',
+            'deadline'    => 'nullable|date',
+            'is_active'   => 'nullable|boolean',
         ]);
 
         AssignedTask::create([
-            'title' => $request->title,
+            'title'       => $request->title,
             'description' => $request->description,
-            'deadline' => $request->deadline,
-            'is_active' => $request->is_active ?? false,
+            'deadline'    => $request->deadline,
+            'is_active'   => $request->has('is_active') ? (bool)$request->is_active : true,
+            'status'      => 'approved',   // SuperAdmin tidak perlu approval
+            'created_by'  => auth()->id(),
         ]);
 
         return redirect()->route('superadmin.tasks.index')->with('success', 'Tugas berhasil dibuat.');

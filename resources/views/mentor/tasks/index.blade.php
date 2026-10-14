@@ -60,12 +60,16 @@
                         <div class="p-6 sm:p-8 flex-1 bg-gray-50/50">
                             <div class="space-y-4">
                                 @forelse($tasks as $task)
-                                    <div class="p-5 bg-white rounded-2xl border {{ $task->is_active ? 'border-green-400 shadow-md ring-1 ring-green-400' : 'border-gray-200 shadow-sm' }} transition-all flex items-center justify-between gap-4 relative overflow-hidden">
+                                    @php
+                                        $isPastDeadline = $task->deadline && \Carbon\Carbon::parse($task->deadline)->isPast();
+                                        $isLive = ($task->status === 'approved' || $task->is_active) && !$isPastDeadline;
+                                    @endphp
+                                    <div class="p-5 bg-white rounded-2xl border {{ $isLive ? 'border-green-400 shadow-md ring-1 ring-green-400' : 'border-gray-200 shadow-sm' }} transition-all flex items-center justify-between gap-4 relative overflow-hidden">
                                         
-                                        @if($task->deadline && \Carbon\Carbon::parse($task->deadline)->isPast())
+                                        @if($isPastDeadline)
                                             <div class="absolute top-0 right-0 bg-red-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-wider">Selesai</div>
-                                        @elseif($task->is_active)
-                                            <div class="absolute top-0 right-0 bg-green-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-wider">Aktif Saat Ini</div>
+                                        @elseif($isLive)
+                                            <div class="absolute top-0 right-0 bg-green-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-wider">Aktif</div>
                                         @endif
 
                                         <div class="flex-1 min-w-0 pr-4 mt-2">

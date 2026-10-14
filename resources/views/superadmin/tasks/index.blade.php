@@ -167,14 +167,18 @@
                                         <span class="badge bg-red-100 text-red-700 border border-red-200 inline-flex items-center gap-1 font-bold">
                                             Selesai
                                         </span>
-                                    @elseif($task->is_active)
+                                    @elseif($task->status === 'approved' || $task->is_active)
                                         <span class="badge bg-green-100 text-green-800 border border-green-200 inline-flex items-center gap-1 font-bold">
                                             <span class="w-1.5 h-1.5 rounded-full bg-green-600 animate-pulse"></span>
                                             Aktif
                                         </span>
+                                    @elseif($task->status === 'rejected')
+                                        <span class="badge bg-red-100 text-red-700 border border-red-200">
+                                            Ditolak
+                                        </span>
                                     @else
-                                        <span class="badge bg-gray-100 text-gray-600 border border-gray-200">
-                                            Nonaktif
+                                        <span class="badge bg-yellow-100 text-yellow-700 border border-yellow-200">
+                                            Menunggu
                                         </span>
                                     @endif
                                 </td>

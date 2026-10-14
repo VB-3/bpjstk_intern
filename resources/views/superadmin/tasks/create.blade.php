@@ -84,12 +84,12 @@
                             <label class="relative flex items-start gap-3 p-4 rounded-2xl bg-gray-50/80 border border-gray-200 cursor-pointer hover:bg-green-50/40 hover:border-green-300 transition-colors">
                                 <div class="flex items-center h-5">
                                     <input type="checkbox" id="is_active" name="is_active" value="1"
-                                        {{ old('is_active') ? 'checked' : '' }}
+                                        {{ old('is_active', '1') ? 'checked' : '' }}
                                         class="w-5 h-5 rounded-lg border-gray-300 text-green-600 focus:ring-green-500 focus:ring-2 transition-colors">
                                 </div>
                                 <div class="text-sm">
                                     <span class="font-bold text-gray-800">Aktifkan tugas ini segera</span>
-                                    <p class="text-xs text-gray-500 mt-0.5">Jika dicentang, tugas yang sedang aktif sebelumnya akan otomatis dinonaktifkan.</p>
+                                    <p class="text-xs text-gray-500 mt-0.5">Jika dicentang, tugas langsung dapat diakses dan dikerjakan oleh peserta.</p>
                                 </div>
                             </label>
                             @error('is_active')

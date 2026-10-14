@@ -10,6 +10,11 @@ class TaskSubmissionController extends Controller
 {
     public function index()
     {
+        // Hanya intern yang boleh akses halaman ini
+        if (!auth()->user()->isIntern()) {
+            abort(403, 'Halaman ini hanya untuk peserta magang.');
+        }
+
         // Ambil semua tugas yang aktif dan belum melewati deadline
         $ongoingTasks = AssignedTask::where('is_active', true)
             ->where('status', 'approved')
@@ -34,6 +39,11 @@ class TaskSubmissionController extends Controller
 
     public function store(Request $request)
     {
+        // Hanya intern yang boleh submit tugas
+        if (!auth()->user()->isIntern()) {
+            abort(403, 'Hanya peserta magang yang dapat mengumpulkan tugas.');
+        }
+
         $request->validate([
             'assigned_task_id' => 'required|exists:assigned_tasks,id',
             'link' => 'required|url',

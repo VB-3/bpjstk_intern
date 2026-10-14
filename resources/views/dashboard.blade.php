@@ -97,12 +97,29 @@
             {{-- Quick link: Tugas --}}
             <a href="{{ route('tasks.index') }}"
                class="glass-effect rounded-2xl p-6 card-hover flex items-center gap-5 group">
-                <div class="stat-icon bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors duration-300">
+                <div class="stat-icon bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors duration-300 relative">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    @if(isset($pendingTasksCount) && $pendingTasksCount > 0)
+                        <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping"></span>
+                        <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+                    @endif
                 </div>
                 <div class="flex-1">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-0.5">Pengumpulan Tugas</p>
-                    <p class="text-base font-bold text-gray-800 group-hover:text-purple-700 transition-colors">Buka Halaman →</p>
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-0.5">Pengumpulan Tugas</p>
+                        @if(isset($pendingTasksCount) && $pendingTasksCount > 0)
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-red-100 text-red-700 border border-red-200">
+                                {{ $pendingTasksCount }} Tugas
+                            </span>
+                        @endif
+                    </div>
+                    <p class="text-base font-bold text-gray-800 group-hover:text-purple-700 transition-colors">
+                        @if(isset($pendingTasksCount) && $pendingTasksCount > 0)
+                            Kerjakan Sekarang →
+                        @else
+                            Buka Halaman →
+                        @endif
+                    </p>
                 </div>
             </a>
         </div>
@@ -262,6 +279,11 @@
                         <a href="{{ $task->link }}" target="_blank" class="block group">
                             <div class="flex items-center gap-4 bg-white rounded-2xl px-4 py-3.5 border border-gray-100 hover:border-blue-200 hover:shadow-sm transition-all">
                                 <div class="flex-1 min-w-0">
+                                    @if($task->assignedTask)
+                                        <p class="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-100 rounded-lg px-2 py-0.5 inline-block mb-1">
+                                            📋 {{ $task->assignedTask->title }}
+                                        </p>
+                                    @endif
                                     <p class="font-bold text-gray-900 text-sm group-hover:text-blue-700 transition-colors">
                                         {{ \Carbon\Carbon::parse($task->submitted_at)->translatedFormat('d M Y') }}
                                         <span class="text-gray-400 font-medium ml-1">{{ \Carbon\Carbon::parse($task->submitted_at)->format('H:i') }}</span>

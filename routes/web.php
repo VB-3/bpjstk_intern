@@ -18,8 +18,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         }
         
         $attendances = \App\Models\Attendance::where('user_id', auth()->id())->orderBy('date', 'desc')->take(5)->get();
-        $tasks = \App\Models\TaskSubmission::where('user_id', auth()->id())->orderBy('submitted_at', 'desc')->take(5)->get();
+        $tasks = \App\Models\TaskSubmission::with('assignedTask')->where('user_id', auth()->id())->orderBy('submitted_at', 'desc')->take(5)->get();
         $totalBpu = \App\Models\Todo::where('user_id', auth()->id())->sum('bpu_achievement');
+
+        // Jumlah tugas aktif yang belum dikumpulkan intern ini
+        $submittedTaskIds = \App\Models\TaskSubmission::where('user_id', auth()->id())->pluck('assigned_task_id')->toArray();
+        $pendingTasksCount = \App\Models\AssignedTask::where('is_active', true)
+            ->where('status', 'approved')
+            ->where(function ($q) {
+                $q->whereNull('deadline')->orWhere('deadline', '>=', now());
+            })
+            ->whereNotIn('id', $submittedTaskIds)
+            ->count();
 
         // Leaderboard BPU
         $bpuLeaderboard = \App\Models\User::where('role', 'intern')
@@ -32,7 +42,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             });
         $bpuTop3 = $bpuLeaderboard->take(3);
         
-        return view('dashboard', compact('attendances', 'tasks', 'totalBpu', 'bpuLeaderboard', 'bpuTop3'));
+        return view('dashboard', compact('attendances', 'tasks', 'totalBpu', 'bpuLeaderboard', 'bpuTop3', 'pendingTasksCount'));
     })->name('dashboard');
 
     // Route leaderboard BPU (accessible oleh semua role)

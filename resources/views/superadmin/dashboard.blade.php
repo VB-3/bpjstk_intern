@@ -336,7 +336,7 @@
                                         {{ $completedTasks->count() }} Selesai
                                     </span>
                                 </h3>
-                                <p class="text-xs text-gray-400">Tugas yang telah melewati batas tanggal atau dinonaktifkan</p>
+                                <p class="text-xs text-gray-400">Tugas yang telah melewati batas tenggat waktu (deadline)</p>
                             </div>
                         </div>
                     </div>

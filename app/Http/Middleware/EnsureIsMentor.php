@@ -15,10 +15,10 @@ class EnsureIsMentor
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->check() || auth()->user()->role !== 'mentor') {
-            return redirect('/');
+        if (!auth()->check() || (!auth()->user()->isMentor() && !auth()->user()->isSuperAdmin())) {
+            abort(403, 'Akses ditolak. Hanya Mentor yang dapat mengakses halaman ini.');
         }
-        
+
         return $next($request);
     }
 }

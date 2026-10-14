@@ -37,28 +37,28 @@ class DashboardController extends Controller
 
         $bpuTop3 = $bpuLeaderboard->take(3);
 
-        // Riwayat Tugas: Pisahkan Tugas Aktif dan Tugas Selesai (sudah melewati batas tanggal)
-        // 1. Tugas Aktif: is_active = true, tenggat belum terlewat (deadline null atau deadline >= now), dan bukan rejected
+        // Riwayat Tugas: Pisahkan Tugas Aktif dan Tugas Selesai (sudah melewati deadline)
+        // 1. Tugas Aktif: is_active = true, tenggat belum terlewat (deadline null atau deadline >= now), dan sudah approved
         $activeTasks = AssignedTask::with('creator')
             ->withCount('submissions')
             ->where('is_active', true)
+            ->where('status', 'approved')
             ->where(function ($q) {
                 $q->whereNull('deadline')->orWhere('deadline', '>=', now());
             })
-            ->where('status', '!=', 'rejected')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('deadline')
             ->take(6)
             ->get();
 
-        // 2. Tugas Selesai: sudah melewati batas tanggal (deadline < now) ATAU ditandai non-aktif (is_active = false)
+        // 2. Tugas Selesai: deadline sudah terlewat (approved/rejected) ATAU is_active = false dan sudah approved
         $completedTasks = AssignedTask::with('creator')
             ->withCount('submissions')
+            ->where('status', 'approved')
             ->where(function ($q) {
                 $q->where(function ($sub) {
                     $sub->whereNotNull('deadline')->where('deadline', '<', now());
                 })->orWhere('is_active', false);
             })
-            ->where('status', '!=', 'pending')
             ->orderBy('deadline', 'desc')
             ->orderBy('created_at', 'desc')
             ->take(6)

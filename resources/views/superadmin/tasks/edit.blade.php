@@ -89,8 +89,8 @@
                                         class="w-5 h-5 rounded-lg border-gray-300 text-green-600 focus:ring-green-500 focus:ring-2 transition-colors">
                                 </div>
                                 <div class="text-sm">
-                                    <span class="font-bold text-gray-800">Aktifkan tugas ini segera</span>
-                                    <p class="text-xs text-gray-500 mt-0.5">Jika dicentang, tugas yang sedang aktif sebelumnya akan otomatis dinonaktifkan.</p>
+                                    <span class="font-bold text-gray-800">Aktifkan tugas ini</span>
+                                    <p class="text-xs text-gray-500 mt-0.5">Jika dicentang, tugas dapat diakses dan dikerjakan oleh peserta. Beberapa tugas bisa aktif sekaligus.</p>
                                 </div>
                             </label>
                             @error('is_active')
