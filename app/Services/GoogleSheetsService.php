@@ -16,7 +16,7 @@ class GoogleSheetsService
 
     public function __construct()
     {
-        $this->spreadsheetId = '1KZSbCixC2odyLTgQhC18ZAjfi4mAR3Q8RqB-yBiUDU8';
+        $this->spreadsheetId = env('GOOGLE_SPREADSHEET_ID', '1KZSbCixC2odyLTgQhC18ZAjfi4mAR3Q8RqB-yBiUDU8');
         
         $this->client = new Google_Client();
         $this->client->setApplicationName('Portal Magang BPJSTK');

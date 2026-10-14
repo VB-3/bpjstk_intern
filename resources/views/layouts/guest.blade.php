@@ -60,5 +60,7 @@
                 </p>
             </div>
         </div>
+
+        <x-security-guard />
     </body>
 </html>

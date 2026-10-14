@@ -22,4 +22,16 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
+
+    # Blokir akses langsung ke file yang diawali titik (misal .env, .git)
+    RewriteRule (^|/)\.(?!well-known/) - [F,L]
+</IfModule>
+
+# Matikan signature server
+ServerSignature Off
+
+<IfModule mod_headers.c>
+    # Hapus header X-Powered-By dari level webserver
+    Header unset X-Powered-By
+    Header always unset X-Powered-By
 </IfModule>

@@ -1,0 +1,16 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # 1. BLOKIR AKSES KE FILE SENSITIF (.env, .git, json konfigurasi, storage/app)
+    RewriteRule ^(\.env|\.git|composer\.(json|lock)|package(-lock)?\.json|vite\.config\.js|phpunit\.xml) - [F,L,NC]
+    RewriteRule ^(app|bootstrap|config|database|resources|routes|storage/(?!app/public).*|tests|vendor)(/.*)?$ - [F,L,NC]
+
+    # 2. Redirect / route semua permintaan ke folder /public
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# Blokir directory indexing
+<IfModule mod_autoindex.c>
+    Options -Indexes
+</IfModule>
