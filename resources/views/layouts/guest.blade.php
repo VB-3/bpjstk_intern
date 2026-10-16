@@ -8,7 +8,7 @@
         <title>{{ config('app.name', 'Portal Magang BPJS Ketenagakerjaan') }}</title>
 
         <!-- Favicon -->
-        <link rel="icon" type="image/x-icon" href="{{ asset('storage/favicon.ico') }}">
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,7 +30,7 @@
                 </div>
                 
                 <div class="relative z-10 px-12 text-center text-white">
-                    <img src="{{ asset('storage/logo bpjstk.png') }}" alt="Logo BPJS Ketenagakerjaan" class="h-28 mx-auto mb-8 drop-shadow-lg object-contain mix-blend-multiply">
+                    <img src="{{ asset('images/logo bpjstk.png') }}" alt="Logo BPJS Ketenagakerjaan" class="h-28 mx-auto mb-8 drop-shadow-lg object-contain mix-blend-multiply">
                     <h1 class="text-4xl font-bold mb-4 tracking-tight">Portal Magang Resmi</h1>
                     <p class="text-green-100 text-lg max-w-md mx-auto">Sistem terpadu untuk pencatatan absensi, pengelolaan tugas, dan pelaporan kegiatan peserta magang BPJS Ketenagakerjaan.</p>
                 </div>
@@ -41,7 +41,7 @@
                 <!-- Mobile Logo -->
                 <div class="lg:hidden mb-10">
                     <a href="/">
-                        <img src="{{ asset('storage/logo bpjstk.png') }}" alt="Logo BPJS" class="h-20 mx-auto object-contain mix-blend-multiply">
+                        <img src="{{ asset('images/logo bpjstk.png') }}" alt="Logo BPJS" class="h-20 mx-auto object-contain mix-blend-multiply">
                     </a>
                 </div>
 

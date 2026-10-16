@@ -6,7 +6,7 @@
     {{-- ── Logo & Brand ─────────────────────────────────────────── --}}
     <div class="flex items-center justify-center h-20 px-6 shrink-0 border-b border-white/10">
         <a href="{{ route('dashboard') }}" class="flex items-center justify-center w-full h-full">
-            <img src="{{ asset('storage/logo bpjstk.png') }}" alt="BPJS" class="h-10 w-auto object-contain">
+            <img src="{{ asset('images/logo bpjstk.png') }}" alt="BPJS" class="h-10 w-auto object-contain">
         </a>
     </div>
 

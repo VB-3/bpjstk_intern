@@ -8,7 +8,7 @@
         <title>{{ config('app.name', 'Portal Magang BPJS Ketenagakerjaan') }}</title>
 
         <!-- Favicon -->
-        <link rel="icon" type="image/x-icon" href="{{ asset('storage/favicon.ico') }}">
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
