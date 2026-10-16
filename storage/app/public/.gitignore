@@ -2,3 +2,10 @@
 !.gitignore
 !*.png
 !*.ico
+!photos/
+!photos/*
+!attendances/
+!attendances/*
+!todos/
+!todos/*
+
