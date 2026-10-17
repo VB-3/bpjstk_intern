@@ -42,12 +42,31 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        $loginField = filter_var($this->input('login'), FILTER_VALIDATE_EMAIL) ? 'email' : 'nim';
+        $loginInput = trim($this->input('login'));
+        $isEmail = filter_var($loginInput, FILTER_VALIDATE_EMAIL);
 
-        $credentials = [
-            $loginField => $this->input('login'),
-            'password' => $this->input('password')
-        ];
+        if ($isEmail) {
+            // Cek apakah akun dengan email ini adalah peserta (intern)
+            $user = \App\Models\User::where('email', $loginInput)->first();
+
+            if ($user && $user->role === 'intern') {
+                RateLimiter::hit($this->throttleKey());
+
+                throw ValidationException::withMessages([
+                    'login' => 'Peserta magang wajib login menggunakan NIM, bukan email.',
+                ]);
+            }
+
+            $credentials = [
+                'email' => $loginInput,
+                'password' => $this->input('password'),
+            ];
+        } else {
+            $credentials = [
+                'nim' => $loginInput,
+                'password' => $this->input('password'),
+            ];
+        }
 
         if (! Auth::attempt($credentials, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
@@ -76,7 +95,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
+            'login' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),

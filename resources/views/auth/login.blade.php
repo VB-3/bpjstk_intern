@@ -4,7 +4,7 @@
 
     <div class="mb-6 sm:mb-8 text-center">
         <h2 class="text-2xl font-bold text-gray-900 tracking-tight">Masuk ke Akun Anda</h2>
-        <p class="text-sm text-gray-500 mt-2">Silakan masukkan email atau NIM dan password.</p>
+        <p class="text-sm text-gray-500 mt-2">Silakan masukkan NIM (peserta) atau Email (admin/mentor).</p>
     </div>
 
     <form method="POST" action="{{ route('login') }}" class="space-y-4 sm:space-y-5">
@@ -12,8 +12,11 @@
 
         <!-- Email Address or NIM -->
         <div>
-            <label for="login" class="block font-medium text-sm text-gray-700 mb-1.5">{{ __('Email atau NIM') }}</label>
-            <input id="login" class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 transition px-4 py-3 bg-gray-50/50 text-sm" type="text" name="login" value="{{ old('login') }}" required autofocus autocomplete="username" placeholder="alamat@email.com atau 12345678" />
+            <div class="flex items-center justify-between mb-1.5">
+                <label for="login" class="block font-medium text-sm text-gray-700">{{ __('NIM / Email') }}</label>
+                <span class="text-xs text-green-600 font-semibold">Peserta wajib NIM</span>
+            </div>
+            <input id="login" class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 transition px-4 py-3 bg-gray-50/50 text-sm" type="text" name="login" value="{{ old('login') }}" required autofocus autocomplete="username" placeholder="Masukkan NIM atau Email" />
             <x-input-error :messages="$errors->get('login')" class="mt-1.5 text-xs sm:text-sm" />
         </div>
 
