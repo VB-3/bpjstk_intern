@@ -26,7 +26,6 @@ class User extends Authenticatable
         'nim',
         'mentor_id',
         'gdrive_link',
-        'photo',
     ];
 
     /**

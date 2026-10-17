@@ -18,11 +18,7 @@
             <div class="relative z-10 p-8 sm:p-10 flex flex-col sm:flex-row items-start sm:items-center gap-6">
                 {{-- avatar --}}
                 <div class="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white shadow-lg shrink-0 text-2xl font-extrabold overflow-hidden">
-                    @if(Auth::user()->photo)
-                        <img src="{{ Storage::url(Auth::user()->photo) }}" alt="Foto Profil" class="w-full h-full object-cover">
-                    @else
-                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                    @endif
+                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                 </div>
                 <div>
                     <p class="text-green-200 text-sm font-semibold uppercase tracking-widest mb-1">Selamat Datang</p>

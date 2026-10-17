@@ -171,13 +171,9 @@
     {{-- ── User Footer ──────────────────────────────────────────── --}}
     <div class="shrink-0 border-t border-white/10 p-4" style="background:rgba(0,0,0,0.15)">
         <div class="flex items-center gap-3 mb-3">
-            @if(Auth::user()->photo)
-                <img src="{{ Storage::url(Auth::user()->photo) }}" alt="Foto Profil" class="w-9 h-9 rounded-xl object-cover shrink-0 shadow-sm">
-            @else
-                <div class="w-9 h-9 rounded-xl bg-green-500 flex items-center justify-center text-white font-extrabold text-sm shrink-0 shadow-sm">
-                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                </div>
-            @endif
+            <div class="w-9 h-9 rounded-xl bg-green-500 flex items-center justify-center text-white font-extrabold text-sm shrink-0 shadow-sm">
+                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+            </div>
             <div class="truncate flex-1 min-w-0">
                 <p class="text-sm font-bold text-white truncate leading-tight">{{ Auth::user()->name }}</p>
                 <p class="text-[11px] text-green-300 truncate">{{ Auth::user()->email }}</p>

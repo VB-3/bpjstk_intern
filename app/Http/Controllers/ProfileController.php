@@ -7,7 +7,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -57,45 +56,5 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
-    }
-
-    /**
-     * Update the user's profile photo.
-     */
-    public function updatePhoto(Request $request): RedirectResponse
-    {
-        $request->validateWithBag('photoUpdate', [
-            'photo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-        ]);
-
-        $user = $request->user();
-
-        if ($request->hasFile('photo')) {
-            if ($user->photo && Storage::disk('public')->exists($user->photo)) {
-                Storage::disk('public')->delete($user->photo);
-            }
-
-            $user->photo = $request->file('photo')->store('photos', 'public');
-            $user->save();
-        }
-
-        return Redirect::route('profile.edit')->with('status', 'photo-updated');
-    }
-
-    /**
-     * Remove the user's profile photo.
-     */
-    public function destroyPhoto(Request $request): RedirectResponse
-    {
-        $user = $request->user();
-
-        if ($user->photo && Storage::disk('public')->exists($user->photo)) {
-            Storage::disk('public')->delete($user->photo);
-        }
-
-        $user->photo = null;
-        $user->save();
-
-        return Redirect::route('profile.edit')->with('status', 'photo-removed');
     }
 }
