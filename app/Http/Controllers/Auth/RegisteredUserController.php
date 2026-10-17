@@ -35,8 +35,12 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'nim' => ['required', 'string', 'numeric', 'unique:'.User::class],
+            'nim' => ['required', 'digits:9', 'unique:'.User::class],
             'mentor_id' => ['required', 'exists:users,id'],
+        ], [
+            'nim.required' => 'NIM wajib diisi.',
+            'nim.digits' => 'NIM harus tepat 9 angka (tidak boleh kurang atau lebih).',
+            'nim.unique' => 'NIM ini sudah terdaftar.',
         ]);
 
         $user = User::create([

@@ -22,8 +22,8 @@
                 <x-input-error :messages="$errors->get('email')" class="mt-1 text-xs" />
             </div>
             <div>
-                <label for="nim" class="block font-medium text-xs sm:text-sm text-gray-700 mb-1">{{ __('NIM') }}</label>
-                <input id="nim" class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 transition px-3.5 py-2 sm:py-2.5 bg-gray-50/50 text-xs sm:text-sm" type="text" name="nim" value="{{ old('nim') }}" required placeholder="Contoh: 12345678" />
+                <label for="nim" class="block font-medium text-xs sm:text-sm text-gray-700 mb-1">{{ __('NIM (9 Digit)') }}</label>
+                <input id="nim" class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 transition px-3.5 py-2 sm:py-2.5 bg-gray-50/50 text-xs sm:text-sm" type="text" name="nim" value="{{ old('nim') }}" required maxlength="9" minlength="9" pattern="\d{9}" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,9)" placeholder="9 digit angka" title="NIM harus terdiri dari tepat 9 angka" />
                 <x-input-error :messages="$errors->get('nim')" class="mt-1 text-xs" />
             </div>
         </div>
