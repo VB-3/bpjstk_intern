@@ -37,7 +37,7 @@
             </div>
 
             <!-- Right Side: Form Content -->
-            <div class="w-full lg:w-1/2 flex flex-col justify-center items-center p-8 sm:p-12 pb-16 sm:pb-12 relative" style="padding-bottom: max(3rem, env(safe-area-inset-bottom, 2rem));">
+            <div class="w-full lg:w-1/2 flex flex-col justify-center items-center p-8 sm:p-12 relative">
                 <!-- Mobile Logo -->
                 <div class="lg:hidden mb-10">
                     <a href="/">

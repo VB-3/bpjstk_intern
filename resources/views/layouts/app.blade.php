@@ -155,7 +155,7 @@
             </div>
 
             <!-- Page Slot -->
-            <main class="flex-1 pb-16 sm:pb-12" style="padding-bottom: max(4rem, env(safe-area-inset-bottom, 2rem));">
+            <main class="flex-1">
                 {{ $slot }}
             </main>
         </div>
