@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'Portal Magang BPJS Ketenagakerjaan') }}</title>
@@ -18,7 +18,7 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased flex h-screen overflow-hidden" x-data="{ sidebarOpen: false }">
+    <body class="font-sans antialiased flex flex-col lg:flex-row min-h-screen min-h-[100dvh] lg:h-screen lg:overflow-hidden" :class="{ 'overflow-hidden': sidebarOpen }" x-data="{ sidebarOpen: false }">
 
         <!-- Mobile Overlay -->
         <div x-show="sidebarOpen"
@@ -31,7 +31,7 @@
         @include('layouts.navigation')
 
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+        <div class="flex-1 flex flex-col min-w-0 lg:overflow-y-auto">
 
             <!-- Top Bar -->
             <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200/70 shadow-sm">
@@ -155,7 +155,7 @@
             </div>
 
             <!-- Page Slot -->
-            <main class="flex-1">
+            <main class="flex-1 pb-16 sm:pb-12" style="padding-bottom: max(4rem, env(safe-area-inset-bottom, 2rem));">
                 {{ $slot }}
             </main>
         </div>

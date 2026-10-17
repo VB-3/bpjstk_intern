@@ -1,6 +1,6 @@
 <nav 
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'" 
-    class="fixed z-50 lg:static inset-y-0 left-0 w-64 text-white shadow-2xl transition-transform duration-300 ease-in-out flex flex-col h-full"
+    class="fixed z-50 lg:static inset-y-0 left-0 w-64 text-white shadow-2xl transition-transform duration-300 ease-in-out flex flex-col h-full h-[100dvh] lg:h-full"
     style="background: linear-gradient(180deg, #14532d 0%, #166534 40%, #15803d 100%);"
 >
     {{-- ── Logo & Brand ─────────────────────────────────────────── --}}
@@ -169,7 +169,7 @@
     </div>
 
     {{-- ── User Footer ──────────────────────────────────────────── --}}
-    <div class="shrink-0 border-t border-white/10 p-4" style="background:rgba(0,0,0,0.15)">
+    <div class="shrink-0 border-t border-white/10 p-4 pb-6 sm:pb-4" style="background:rgba(0,0,0,0.15); padding-bottom: max(1.25rem, env(safe-area-inset-bottom, 1rem));">
         <div class="flex items-center gap-3 mb-3">
             <div class="w-9 h-9 rounded-xl bg-green-500 flex items-center justify-center text-white font-extrabold text-sm shrink-0 shadow-sm">
                 {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}

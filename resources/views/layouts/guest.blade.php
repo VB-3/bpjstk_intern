@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'Portal Magang BPJS Ketenagakerjaan') }}</title>
@@ -37,7 +37,7 @@
             </div>
 
             <!-- Right Side: Form Content -->
-            <div class="w-full lg:w-1/2 flex flex-col justify-center items-center p-8 sm:p-12 relative">
+            <div class="w-full lg:w-1/2 flex flex-col justify-center items-center p-8 sm:p-12 pb-16 sm:pb-12 relative" style="padding-bottom: max(3rem, env(safe-area-inset-bottom, 2rem));">
                 <!-- Mobile Logo -->
                 <div class="lg:hidden mb-10">
                     <a href="/">
