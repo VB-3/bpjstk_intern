@@ -48,9 +48,9 @@
                     </a>
                 </div>
 
-                <div class="w-full max-w-md shrink-0">
+                <div class="w-full max-w-md sm:max-w-lg shrink-0">
                     <!-- The Form Area -->
-                    <div class="bg-white/80 backdrop-blur-xl shadow-xl sm:shadow-2xl rounded-2xl sm:rounded-3xl p-5 sm:p-8 border border-gray-100 relative">
+                    <div class="bg-white/80 backdrop-blur-xl shadow-xl sm:shadow-2xl rounded-2xl sm:rounded-3xl p-6 sm:p-9 border border-gray-100 relative">
                         <!-- Decorative top accent -->
                         <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-1/3 h-1 bg-green-500 rounded-b-lg"></div>
                         
