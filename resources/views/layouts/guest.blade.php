@@ -42,9 +42,9 @@
             <!-- Right Side: Form Content -->
             <div class="w-full lg:w-1/2 flex flex-col justify-center items-center px-4 py-3 sm:px-8 sm:py-6 relative {{ $isFixed ? 'h-full overflow-hidden overscroll-none' : 'min-h-screen min-h-[100dvh] overflow-y-auto' }}">
                 <!-- Mobile Logo -->
-                <div class="lg:hidden mb-3 sm:mb-5 shrink-0">
+                <div class="lg:hidden mb-4 sm:mb-6 shrink-0">
                     <a href="/">
-                        <img src="{{ asset('images/logo bpjstk.png') }}" alt="Logo BPJS" class="h-12 sm:h-16 mx-auto object-contain mix-blend-multiply">
+                        <img src="{{ asset('images/logo bpjstk.png') }}" alt="Logo BPJS" class="h-16 sm:h-20 mx-auto object-contain mix-blend-multiply">
                     </a>
                 </div>
 
