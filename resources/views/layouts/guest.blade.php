@@ -1,5 +1,5 @@
 @php
-    $isFixed = $fixed || request()->routeIs('login') || request()->routeIs('password.request');
+    $isFixed = $fixed || request()->routeIs('login') || request()->routeIs('register') || request()->routeIs('password.request');
 @endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="{{ $isFixed ? 'h-full overflow-hidden' : '' }}">
@@ -40,17 +40,17 @@
             </div>
 
             <!-- Right Side: Form Content -->
-            <div class="w-full lg:w-1/2 flex flex-col justify-center items-center px-6 py-6 sm:p-12 relative {{ $isFixed ? 'h-full overflow-hidden overscroll-none' : 'min-h-screen min-h-[100dvh] overflow-y-auto' }}">
+            <div class="w-full lg:w-1/2 flex flex-col justify-center items-center px-4 py-3 sm:px-8 sm:py-6 relative {{ $isFixed ? 'h-full overflow-hidden overscroll-none' : 'min-h-screen min-h-[100dvh] overflow-y-auto' }}">
                 <!-- Mobile Logo -->
-                <div class="lg:hidden mb-6 shrink-0">
+                <div class="lg:hidden mb-3 sm:mb-5 shrink-0">
                     <a href="/">
-                        <img src="{{ asset('images/logo bpjstk.png') }}" alt="Logo BPJS" class="h-16 sm:h-20 mx-auto object-contain mix-blend-multiply">
+                        <img src="{{ asset('images/logo bpjstk.png') }}" alt="Logo BPJS" class="h-12 sm:h-16 mx-auto object-contain mix-blend-multiply">
                     </a>
                 </div>
 
                 <div class="w-full max-w-md shrink-0">
                     <!-- The Form Area -->
-                    <div class="bg-white/80 backdrop-blur-xl shadow-2xl rounded-3xl p-7 sm:p-10 border border-gray-100 relative">
+                    <div class="bg-white/80 backdrop-blur-xl shadow-xl sm:shadow-2xl rounded-2xl sm:rounded-3xl p-5 sm:p-8 border border-gray-100 relative">
                         <!-- Decorative top accent -->
                         <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-1/3 h-1 bg-green-500 rounded-b-lg"></div>
                         
@@ -58,7 +58,7 @@
                     </div>
                 </div>
                 
-                <p class="mt-6 text-xs sm:text-sm text-gray-500 text-center shrink-0">
+                <p class="mt-3 sm:mt-4 text-[11px] sm:text-xs text-gray-500 text-center shrink-0">
                     &copy; {{ date('Y') }} BPJS Ketenagakerjaan
                 </p>
             </div>
