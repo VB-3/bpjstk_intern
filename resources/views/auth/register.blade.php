@@ -10,7 +10,7 @@
         <!-- Nama Lengkap -->
         <div>
             <label for="name" class="block font-medium text-sm text-gray-700 mb-1.5">{{ __('Nama Lengkap') }}</label>
-            <input id="name" class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 transition px-4 py-2.5 sm:py-3 bg-gray-50/50 text-sm" type="text" name="name" value="{{ old('name') }}" required autofocus autocomplete="name" placeholder="Nama lengkap Anda" />
+            <input id="name" class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 transition px-4 py-2.5 sm:py-3 bg-gray-50/50 text-sm uppercase" type="text" name="name" value="{{ old('name') }}" required autofocus autocomplete="name" oninput="this.value = this.value.toUpperCase()" placeholder="NAMA LENGKAP ANDA" />
             <x-input-error :messages="$errors->get('name')" class="mt-1 text-xs" />
         </div>
 
