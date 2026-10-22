@@ -90,5 +90,17 @@ class User extends Authenticatable
     {
         return $this->hasMany(User::class, 'mentor_id');
     }
+
+    public function getFormattedGdriveLinkAttribute()
+    {
+        if (!$this->gdrive_link) {
+            return null;
+        }
+        $link = trim($this->gdrive_link);
+        if (!preg_match("~^(?:f|ht)tps?://~i", $link)) {
+            return "https://" . $link;
+        }
+        return $link;
+    }
 }
 

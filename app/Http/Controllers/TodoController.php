@@ -64,10 +64,15 @@ class TodoController extends Controller
     public function storeGdriveLink(Request $request)
     {
         $request->validate([
-            'gdrive_link' => 'required|url',
+            'gdrive_link' => 'required|string',
         ]);
 
-        auth()->user()->update(['gdrive_link' => $request->gdrive_link]);
+        $link = trim($request->gdrive_link);
+        if (!preg_match("~^(?:f|ht)tps?://~i", $link)) {
+            $link = 'https://' . $link;
+        }
+
+        auth()->user()->update(['gdrive_link' => $link]);
 
         return redirect()->back()->with('success', 'Link Google Drive berhasil disimpan. Silakan isi kegiatan harian Anda.');
     }
