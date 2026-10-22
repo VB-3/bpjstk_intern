@@ -18,7 +18,12 @@ class TodoController extends Controller
 
         $todos = $query->orderBy('date', 'desc')->paginate(4)->appends(request()->only('date'));
         $todayTodo = Todo::where('user_id', auth()->id())->where('date', today())->first();
-        $totalBpu = Todo::where('user_id', auth()->id())->sum('bpu_achievement');
+
+        // Ambil total BPU dari spreadsheet berdasarkan NIM, fallback ke DB
+        $sheetsService = app(\App\Services\GoogleSheetsService::class);
+        $leaderboard = $sheetsService->getLeaderboard();
+        $myBpu = $leaderboard->firstWhere('nim', auth()->user()->nim);
+        $totalBpu = $myBpu ? $myBpu->total_bpu : Todo::where('user_id', auth()->id())->sum('bpu_achievement');
 
         return view('todos.index', compact('todos', 'todayTodo', 'totalBpu'));
     }

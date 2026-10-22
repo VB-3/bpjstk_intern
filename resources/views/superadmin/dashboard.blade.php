@@ -209,7 +209,7 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p class="font-bold text-gray-900 text-sm truncate">{{ $peserta->name }}</p>
-                                <p class="text-xs text-gray-400 truncate">{{ $peserta->email }}</p>
+                                <p class="text-xs text-gray-400 truncate">{{ $peserta->nim ?? $peserta->email ?? '' }}</p>
                             </div>
                             <div class="text-right shrink-0">
                                 <p class="text-xl font-extrabold {{ $isTop ? 'text-yellow-600' : 'text-gray-700' }}">{{ $peserta->total_bpu }}</p>

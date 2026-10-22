@@ -19,7 +19,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         
         $attendances = \App\Models\Attendance::where('user_id', auth()->id())->orderBy('date', 'desc')->take(5)->get();
         $tasks = \App\Models\TaskSubmission::with('assignedTask')->where('user_id', auth()->id())->orderBy('submitted_at', 'desc')->take(5)->get();
-        $totalBpu = \App\Models\Todo::where('user_id', auth()->id())->sum('bpu_achievement');
+
+        // Leaderboard BPU realtime dari Google Spreadsheet
+        $sheetsService = app(\App\Services\GoogleSheetsService::class);
+        $bpuLeaderboard = $sheetsService->getLeaderboard();
+        $bpuTop3 = $bpuLeaderboard->take(3);
+
+        // Total BPU user dari spreadsheet (berdasarkan NIM), fallback ke DB
+        $myBpu = $bpuLeaderboard->firstWhere('nim', auth()->user()->nim);
+        $totalBpu = $myBpu ? $myBpu->total_bpu : \App\Models\Todo::where('user_id', auth()->id())->sum('bpu_achievement');
 
         // Jumlah tugas aktif yang belum dikumpulkan intern ini
         $submittedTaskIds = \App\Models\TaskSubmission::where('user_id', auth()->id())->pluck('assigned_task_id')->toArray();
@@ -30,32 +38,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
             })
             ->whereNotIn('id', $submittedTaskIds)
             ->count();
-
-        // Leaderboard BPU
-        $bpuLeaderboard = \App\Models\User::where('role', 'intern')
-            ->withSum('todos', 'bpu_achievement')
-            ->orderByDesc('todos_sum_bpu_achievement')
-            ->get()
-            ->map(function ($user) {
-                $user->total_bpu = $user->todos_sum_bpu_achievement ?? 0;
-                return $user;
-            });
-        $bpuTop3 = $bpuLeaderboard->take(3);
         
         return view('dashboard', compact('attendances', 'tasks', 'totalBpu', 'bpuLeaderboard', 'bpuTop3', 'pendingTasksCount'));
     })->name('dashboard');
 
     // Route leaderboard BPU (accessible oleh semua role)
     Route::get('/leaderboard/bpu', function () {
-        $bpuLeaderboard = \App\Models\User::where('role', 'intern')
-            ->withSum('todos', 'bpu_achievement')
-            ->orderByDesc('todos_sum_bpu_achievement')
-            ->get()
-            ->map(function ($user) {
-                $user->total_bpu = $user->todos_sum_bpu_achievement ?? 0;
-                return $user;
-            });
-        return response()->json($bpuLeaderboard->map(fn($u) => ['name' => $u->name, 'total_bpu' => $u->total_bpu]));
+        $bpuLeaderboard = app(\App\Services\GoogleSheetsService::class)->getLeaderboard();
+        return response()->json($bpuLeaderboard->map(fn($u) => ['name' => $u->name, 'nim' => $u->nim, 'total_bpu' => $u->total_bpu]));
     })->name('leaderboard.bpu');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

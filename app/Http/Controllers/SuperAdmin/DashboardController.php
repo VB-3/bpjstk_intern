@@ -25,16 +25,9 @@ class DashboardController extends Controller
         $recentUsers = User::orderBy('created_at', 'desc')->take(5)->get();
         $recentSubmissions = TaskSubmission::with('user')->orderBy('submitted_at', 'desc')->take(5)->get();
 
-        // Leaderboard BPU: semua peserta magang diurutkan berdasarkan total BPU terbanyak
-        $bpuLeaderboard = User::where('role', 'intern')
-            ->withSum('todos', 'bpu_achievement')
-            ->orderByDesc('todos_sum_bpu_achievement')
-            ->get()
-            ->map(function ($user) {
-                $user->total_bpu = $user->todos_sum_bpu_achievement ?? 0;
-                return $user;
-            });
-
+        // Leaderboard BPU realtime dari Google Spreadsheet
+        $sheetsService = app(\App\Services\GoogleSheetsService::class);
+        $bpuLeaderboard = $sheetsService->getLeaderboard();
         $bpuTop3 = $bpuLeaderboard->take(3);
 
         // Riwayat Tugas: Pisahkan Tugas Aktif dan Tugas Selesai (sudah melewati deadline)

@@ -7,6 +7,8 @@ use Google_Service_Sheets;
 use Google_Service_Sheets_ValueRange;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 
 class GoogleSheetsService
 {
@@ -16,7 +18,7 @@ class GoogleSheetsService
 
     public function __construct()
     {
-        $this->spreadsheetId = env('GOOGLE_SPREADSHEET_ID', '1KZSbCixC2odyLTgQhC18ZAjfi4mAR3Q8RqB-yBiUDU8');
+        $this->spreadsheetId = env('GOOGLE_SPREADSHEET_ID', '1Jo2qkM90WfM6DoIdLeDAcVEANO89TW3Nkr9lvbK8uBw');
         
         $this->client = new Google_Client();
         $this->client->setApplicationName('Portal Magang BPJSTK');
@@ -30,6 +32,86 @@ class GoogleSheetsService
             $this->client->setAuthConfig($credentialsPath);
             $this->service = new Google_Service_Sheets($this->client);
         }
+    }
+
+    /**
+     * Mengambil data leaderboard BPU realtime dari sheet 'leaderboard'
+     * Di-cache selama 30 detik untuk efisiensi dan performa tinggi
+     */
+    public function getLeaderboard()
+    {
+        return Cache::remember('google_sheets_leaderboard', 30, function () {
+            return $this->fetchLeaderboardFromSheet();
+        });
+    }
+
+    protected function fetchLeaderboardFromSheet()
+    {
+        try {
+            $url = "https://docs.google.com/spreadsheets/d/{$this->spreadsheetId}/gviz/tq?tqx=out:csv&sheet=leaderboard";
+            $response = Http::timeout(6)->get($url);
+
+            if (!$response->successful()) {
+                Log::warning('Failed fetching leaderboard from Google Sheet: HTTP ' . $response->status());
+                return $this->fallbackLeaderboardFromDatabase();
+            }
+
+            $csv = $response->body();
+            $lines = explode("\n", trim($csv));
+            if (count($lines) < 2) {
+                return $this->fallbackLeaderboardFromDatabase();
+            }
+
+            // Buang baris header pertama
+            array_shift($lines);
+
+            $results = collect();
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if (empty($line)) continue;
+
+                $row = str_getcsv($line);
+                $nim = trim($row[0] ?? '');
+                $name = trim($row[1] ?? '');
+                $grandTotal = trim($row[4] ?? '');
+
+                // Abaikan jika baris total atau kosong
+                if (empty($nim) && empty($name)) continue;
+                if (stripos($name, 'total') !== false || stripos($nim, 'total') !== false) continue;
+                if (!is_numeric($grandTotal)) continue;
+
+                $results->push((object)[
+                    'nim'       => $nim,
+                    'name'      => $name ?: ($nim ?: 'Peserta Magang'),
+                    'total_bpu' => (int)$grandTotal,
+                ]);
+            }
+
+            if ($results->isEmpty()) {
+                return $this->fallbackLeaderboardFromDatabase();
+            }
+
+            return $results->sortByDesc('total_bpu')->values();
+
+        } catch (Exception $e) {
+            Log::error('Exception in fetchLeaderboardFromSheet: ' . $e->getMessage());
+            return $this->fallbackLeaderboardFromDatabase();
+        }
+    }
+
+    protected function fallbackLeaderboardFromDatabase()
+    {
+        return \App\Models\User::where('role', 'intern')
+            ->withSum('todos', 'bpu_achievement')
+            ->orderByDesc('todos_sum_bpu_achievement')
+            ->get()
+            ->map(function ($user) {
+                return (object)[
+                    'nim'       => $user->nim,
+                    'name'      => $user->name,
+                    'total_bpu' => $user->todos_sum_bpu_achievement ?? 0,
+                ];
+            });
     }
 
     public function appendTodoRow($name, $gdriveLink, $summary, $date)
