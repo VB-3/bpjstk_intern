@@ -5,13 +5,19 @@
         </h2>
 
         <p class="mt-1 text-sm text-gray-500">
-            {{ __('Perbarui nama dan alamat email akun Anda.') }}
+            @if(auth()->user()->isIntern())
+                {{ __('Perbarui nama akun Anda.') }}
+            @else
+                {{ __('Perbarui nama dan alamat email akun Anda.') }}
+            @endif
         </p>
     </header>
 
+    @if(!auth()->user()->isIntern())
     <form id="send-verification" method="post" action="{{ route('verification.send') }}">
         @csrf
     </form>
+    @endif
 
     <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-5">
         @csrf
@@ -25,6 +31,7 @@
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
 
+        @if(!auth()->user()->isIntern())
         <div>
             <label for="email" class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">{{ __('Email') }}</label>
             <input id="email" name="email" type="email"
@@ -50,6 +57,7 @@
                 </div>
             @endif
         </div>
+        @endif
 
         <div class="flex items-center gap-4">
             <button type="submit"
@@ -65,3 +73,4 @@
         </div>
     </form>
 </section>
+

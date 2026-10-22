@@ -35,7 +35,7 @@
 
                 {{-- Form Body --}}
                 <div class="p-6 sm:p-8 bg-white/80">
-                    <form method="POST" action="{{ route('superadmin.users.store') }}" class="space-y-6">
+                    <form method="POST" action="{{ route('superadmin.users.store') }}" class="space-y-6" id="create-user-form">
                         @csrf
 
                         {{-- Nama --}}
@@ -52,25 +52,13 @@
                             <x-input-error :messages="$errors->get('name')" class="mt-2" />
                         </div>
 
-                        {{-- Email --}}
-                        <div>
-                            <x-input-label for="email" :value="__('Alamat Email')" class="font-bold text-gray-700" />
-                            <x-text-input id="email"
-                                          name="email"
-                                          type="email"
-                                          class="block w-full mt-1.5 border-gray-200 bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-green-500 rounded-xl shadow-sm transition-colors text-sm py-2.5 px-4"
-                                          :value="old('email')"
-                                          required
-                                          placeholder="contoh: pengguna@bpjsketenagakerjaan.go.id" />
-                            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-                        </div>
-
                         {{-- Role --}}
                         <div>
                             <x-input-label for="role" :value="__('Peran (Role)')" class="font-bold text-gray-700" />
                             <select id="role"
                                     name="role"
                                     required
+                                    onchange="toggleRoleFields(this.value)"
                                     class="block w-full mt-1.5 border border-gray-200 bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-green-500 rounded-xl shadow-sm transition-colors text-sm py-2.5 px-4 font-medium text-gray-700 outline-none">
                                 <option value="" disabled {{ old('role') ? '' : 'selected' }}>Pilih peran...</option>
                                 <option value="intern" {{ old('role') === 'intern' ? 'selected' : '' }}>Peserta Magang</option>
@@ -78,6 +66,51 @@
                                 <option value="super_admin" {{ old('role') === 'super_admin' ? 'selected' : '' }}>Super Admin</option>
                             </select>
                             <x-input-error :messages="$errors->get('role')" class="mt-2" />
+                        </div>
+
+                        {{-- ── Bidang untuk NON-INTERN (Mentor / Super Admin) ── --}}
+                        <div id="field-email" class="{{ old('role', '') === 'intern' ? 'hidden' : '' }}">
+                            <x-input-label for="email" :value="__('Alamat Email')" class="font-bold text-gray-700" />
+                            <x-text-input id="email"
+                                          name="email"
+                                          type="email"
+                                          class="block w-full mt-1.5 border-gray-200 bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-green-500 rounded-xl shadow-sm transition-colors text-sm py-2.5 px-4"
+                                          :value="old('email')"
+                                          placeholder="contoh: pengguna@bpjsketenagakerjaan.go.id" />
+                            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                        </div>
+
+                        {{-- ── Bidang untuk INTERN ── --}}
+                        <div id="field-intern-extra" class="{{ old('role', '') !== 'intern' ? 'hidden' : '' }} space-y-4">
+                            {{-- NIM --}}
+                            <div>
+                                <x-input-label for="nim" :value="__('NIM (9 Digit)')" class="font-bold text-gray-700" />
+                                <x-text-input id="nim"
+                                              name="nim"
+                                              type="text"
+                                              class="block w-full mt-1.5 border-gray-200 bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-green-500 rounded-xl shadow-sm transition-colors text-sm py-2.5 px-4"
+                                              :value="old('nim')"
+                                              maxlength="9"
+                                              minlength="9"
+                                              inputmode="numeric"
+                                              oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,9)"
+                                              placeholder="9 digit angka" />
+                                <x-input-error :messages="$errors->get('nim')" class="mt-2" />
+                            </div>
+
+                            {{-- Mentor --}}
+                            <div>
+                                <x-input-label for="mentor_id" :value="__('Pilih Mentor')" class="font-bold text-gray-700" />
+                                <select id="mentor_id"
+                                        name="mentor_id"
+                                        class="block w-full mt-1.5 border border-gray-200 bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-green-500 rounded-xl shadow-sm transition-colors text-sm py-2.5 px-4 font-medium text-gray-700 outline-none">
+                                    <option value="">-- Pilih Mentor --</option>
+                                    @foreach($mentors as $mentor)
+                                        <option value="{{ $mentor->id }}" {{ old('mentor_id') == $mentor->id ? 'selected' : '' }}>{{ $mentor->name }}</option>
+                                    @endforeach
+                                </select>
+                                <x-input-error :messages="$errors->get('mentor_id')" class="mt-2" />
+                            </div>
                         </div>
 
                         {{-- Password --}}
@@ -123,5 +156,36 @@
             </div>
         </div>
     </div>
-</x-app-layout>
 
+    <script>
+        function toggleRoleFields(role) {
+            const emailField  = document.getElementById('field-email');
+            const internExtra = document.getElementById('field-intern-extra');
+            const nimInput    = document.getElementById('nim');
+            const mentorInput = document.getElementById('mentor_id');
+            const emailInput  = document.getElementById('email');
+
+            if (role === 'intern') {
+                emailField.classList.add('hidden');
+                internExtra.classList.remove('hidden');
+                emailInput.removeAttribute('required');
+                nimInput.setAttribute('required', '');
+                mentorInput.setAttribute('required', '');
+            } else {
+                emailField.classList.remove('hidden');
+                internExtra.classList.add('hidden');
+                emailInput.setAttribute('required', '');
+                nimInput.removeAttribute('required');
+                mentorInput.removeAttribute('required');
+            }
+        }
+
+        // Jalankan saat halaman load (untuk kasus old() setelah validasi gagal)
+        document.addEventListener('DOMContentLoaded', function () {
+            const roleSelect = document.getElementById('role');
+            if (roleSelect.value) {
+                toggleRoleFields(roleSelect.value);
+            }
+        });
+    </script>
+</x-app-layout>

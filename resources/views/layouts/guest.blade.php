@@ -1,5 +1,5 @@
 @php
-    $isFixed = $fixed || request()->routeIs('login') || request()->routeIs('register') || request()->routeIs('password.request');
+    $isFixed = $fixed || request()->routeIs('login') || request()->routeIs('password.request');
 @endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="{{ $isFixed ? 'h-full overflow-hidden' : '' }}">

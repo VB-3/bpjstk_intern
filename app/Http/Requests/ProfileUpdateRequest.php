@@ -16,16 +16,22 @@ class ProfileUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
-            'email' => [
+        ];
+
+        // Email hanya untuk mentor & superadmin — intern login via NIM
+        if (!$this->user()->isIntern()) {
+            $rules['email'] = [
                 'required',
                 'string',
                 'lowercase',
                 'email',
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
-            ],
-        ];
+            ];
+        }
+
+        return $rules;
     }
 }

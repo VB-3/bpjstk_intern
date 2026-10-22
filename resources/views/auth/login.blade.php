@@ -45,11 +45,5 @@
             </button>
         </div>
         
-        <div class="text-center pt-2">
-            <p class="text-sm text-gray-600">
-                Belum punya akun? 
-                <a href="{{ route('register') }}" class="font-semibold text-green-600 hover:text-green-500 transition">Daftar sekarang</a>
-            </p>
-        </div>
     </form>
 </x-guest-layout>
