@@ -36,12 +36,15 @@ class TodoController extends Controller
             return redirect()->back()->with('error', 'Anda sudah mengisi To-Do List hari ini.');
         }
 
+        // Intern tidak diizinkan mengisi BPU — selalu disimpan sebagai 0
+        $bpuValue = auth()->user()->isSuperAdmin() ? ($request->bpu_achievement ?? 0) : 0;
+
         // Simpan ke database terlebih dahulu
         Todo::create([
             'user_id'         => auth()->id(),
             'date'            => today(),
             'summary'         => $request->summary,
-            'bpu_achievement' => $request->bpu_achievement ?? 0,
+            'bpu_achievement' => $bpuValue,
         ]);
 
         // Coba kirim ke Google Sheets (jika gagal, data di DB tetap aman)
@@ -71,9 +74,9 @@ class TodoController extends Controller
 
     public function updateBpu(Request $request, Todo $todo)
     {
-        // Pastikan todo milik user yang login
-        if ($todo->user_id !== auth()->id()) {
-            abort(403, 'Akses ditolak.');
+        // Hanya super admin yang boleh mengubah BPU
+        if (!auth()->user()->isSuperAdmin()) {
+            abort(403, 'Hanya Super Admin yang dapat mengubah pencapaian BPU.');
         }
 
         $request->validate([

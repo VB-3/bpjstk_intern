@@ -79,12 +79,14 @@
                                         class="w-full border border-gray-200 bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 rounded-xl px-4 py-3 text-sm font-medium transition-all outline-none resize-none"></textarea>
                                     <p class="mt-1.5 text-xs text-gray-400">Dokumentasi foto unggah ke Google Drive Anda.</p>
                                 </div>
+                                @if(auth()->user()->isSuperAdmin())
                                 <div>
                                     <label for="bpu_achievement" class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Pencapaian BPU Harian</label>
                                     <input id="bpu_achievement" name="bpu_achievement" type="number" min="0" value="0" required
                                         class="w-full border border-gray-200 bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 rounded-xl px-4 py-2.5 text-sm font-medium transition-all outline-none">
                                     <p class="mt-1.5 text-xs text-gray-400">Isi 0 jika tidak ada pencapaian BPU.</p>
                                 </div>
+                                @endif
                                 <button type="submit" x-bind:disabled="loading"
                                     class="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm text-white shadow-md shadow-green-200 disabled:opacity-70 transition-all"
                                     style="background:linear-gradient(135deg,#22c55e,#16a34a)">
@@ -107,17 +109,30 @@
                             </div>
 
                             <div class="mt-4 pt-5 border-t border-gray-100">
-                                <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Update Pencapaian BPU</label>
-                                <form method="POST" action="{{ route('todos.updateBpu', $todayTodo) }}" class="flex gap-3">
-                                    @csrf
-                                    @method('PUT')
-                                    <input name="bpu_achievement" type="number" min="0" value="{{ $todayTodo->bpu_achievement }}"
-                                        class="flex-1 border border-gray-200 bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 rounded-xl px-4 py-2.5 text-sm font-medium outline-none">
-                                    <button type="submit"
-                                        class="px-4 py-2.5 rounded-xl bg-green-100 hover:bg-green-200 text-green-800 text-sm font-bold transition-colors">
-                                        Update
-                                    </button>
-                                </form>
+                                @if(auth()->user()->isSuperAdmin())
+                                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Update Pencapaian BPU</label>
+                                    <form method="POST" action="{{ route('todos.updateBpu', $todayTodo) }}" class="flex gap-3">
+                                        @csrf
+                                        @method('PUT')
+                                        <input name="bpu_achievement" type="number" min="0" value="{{ $todayTodo->bpu_achievement }}"
+                                            class="flex-1 border border-gray-200 bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 rounded-xl px-4 py-2.5 text-sm font-medium outline-none">
+                                        <button type="submit"
+                                            class="px-4 py-2.5 rounded-xl bg-green-100 hover:bg-green-200 text-green-800 text-sm font-bold transition-colors">
+                                            Update
+                                        </button>
+                                    </form>
+                                @else
+                                    <div class="flex items-center justify-between p-3.5 bg-gray-50 rounded-2xl border border-gray-100">
+                                        <div>
+                                            <span class="block text-xs font-bold text-gray-600 uppercase tracking-wider">Pencapaian BPU Hari Ini</span>
+                                            <span class="text-[11px] text-gray-400">Divalidasi & diinput oleh Super Admin</span>
+                                        </div>
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200/60">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                            {{ $todayTodo->bpu_achievement }} Orang
+                                        </span>
+                                    </div>
+                                @endif
                             </div>
                         @endif
                     </div>
