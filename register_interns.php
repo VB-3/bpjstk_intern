@@ -1,8 +1,10 @@
 <?php
 
 /**
- * Script pendaftaran peserta magang BPJS
- * Jalankan dengan: php register_interns.php
+ * Script pendaftaran ulang peserta magang BPJS
+ * - Hapus semua akun intern
+ * - Buat mentor UNCHECKED jika belum ada
+ * - Daftarkan ulang semua peserta
  */
 
 require __DIR__ . '/vendor/autoload.php';
@@ -15,39 +17,67 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 
 // =============================================
-// MAPPING MENTOR NAME => MENTOR ID
+// STEP 1: HAPUS SEMUA AKUN INTERN
 // =============================================
-$mentorMap = [
-    'ARI'     => null,
-    'EKA'     => null,
-    'FARIZA'  => null,
-    'FITRIANI'=> null,
-    'GHAFFAR' => null,
-    'RISNIAR' => null,
-    'SAKINAH' => null,
-    'SENDI'   => null,
-    'UDUR'    => null,
+echo "=== STEP 1: HAPUS SEMUA AKUN INTERN ===" . PHP_EOL;
+$deletedCount = User::where('role', 'intern')->delete();
+echo "  => $deletedCount akun intern dihapus." . PHP_EOL . PHP_EOL;
+
+// =============================================
+// STEP 2: BUAT / AMBIL MENTOR UNCHECKED
+// =============================================
+echo "=== STEP 2: MENTOR UNCHECKED ===" . PHP_EOL;
+$uncheckedMentor = User::where('role', 'mentor')
+    ->where('name', 'UNCHECKED')
+    ->first();
+
+if (!$uncheckedMentor) {
+    $uncheckedMentor = User::create([
+        'name'     => 'UNCHECKED',
+        'email'    => 'unchecked@mentor.com',
+        'password' => Hash::make('unchecked@mentor.com'),
+        'role'     => 'mentor',
+    ]);
+    echo "  => Mentor UNCHECKED dibuat dengan ID: " . $uncheckedMentor->id . PHP_EOL;
+} else {
+    echo "  => Mentor UNCHECKED sudah ada dengan ID: " . $uncheckedMentor->id . PHP_EOL;
+}
+echo PHP_EOL;
+
+// =============================================
+// STEP 3: MAPPING MENTOR NAME => ID
+// =============================================
+echo "=== STEP 3: MENTOR MAP ===" . PHP_EOL;
+$mentorKeywords = [
+    'ARI'       => null,
+    'EKA'       => null,
+    'FARIZA'    => null,
+    'FITRIANI'  => null,
+    'GHAFFAR'   => null,
+    'RISNIAR'   => null,
+    'SAKINAH'   => null,
+    'SENDI'     => null,
+    'UDUR'      => null,
+    'UNCHECKED' => $uncheckedMentor->id,
 ];
 
-// Ambil semua mentor dari DB
 $mentors = User::where('role', 'mentor')->get();
 foreach ($mentors as $mentor) {
     $nameParts = explode(' ', strtoupper($mentor->name));
     $firstName = $nameParts[0];
-    if (array_key_exists($firstName, $mentorMap)) {
-        $mentorMap[$firstName] = $mentor->id;
+    if (array_key_exists($firstName, $mentorKeywords)) {
+        $mentorKeywords[$firstName] = $mentor->id;
     }
 }
 
-echo "=== MENTOR MAP ===" . PHP_EOL;
-foreach ($mentorMap as $key => $id) {
+foreach ($mentorKeywords as $key => $id) {
     echo "  $key => " . ($id ?? 'NOT FOUND') . PHP_EOL;
 }
 echo PHP_EOL;
 
 // =============================================
-// DATA PESERTA MAGANG
-// Format: [NIM, Nama, Mentor (atau null)]
+// STEP 4: DATA PESERTA MAGANG
+// Format: [NIM, Nama, Mentor key (atau null = UNCHECKED)]
 // =============================================
 $interns = [
     ['220906074', 'Agung Prasetyo Siregar', null],
@@ -270,82 +300,38 @@ $interns = [
 ];
 
 // =============================================
-// BUAT MENTOR UDUR JIKA BELUM ADA
+// STEP 4: DAFTARKAN PESERTA
 // =============================================
-$udurMentor = User::where('role', 'mentor')->where('name', 'LIKE', '%UDUR%')->first();
-if (!$udurMentor) {
-    echo "Membuat akun mentor UDUR..." . PHP_EOL;
-    $udurMentor = User::create([
-        'name'     => 'UDUR',
-        'email'    => 'udur@mentor.com',
-        'password' => Hash::make('udur@mentor.com'),
-        'role'     => 'mentor',
-    ]);
-    echo "  => Mentor UDUR dibuat dengan ID: " . $udurMentor->id . PHP_EOL;
-} else {
-    echo "Mentor UDUR sudah ada dengan ID: " . $udurMentor->id . PHP_EOL;
-}
-$mentorMap['UDUR'] = $udurMentor->id;
+echo "=== STEP 4: DAFTARKAN PESERTA MAGANG ===" . PHP_EOL;
 
-echo PHP_EOL;
-
-// =============================================
-// PENDAFTARAN PESERTA MAGANG
-// =============================================
-$created   = 0;
-$skipped   = 0;
-$updated   = 0;
-$errors    = [];
+$created = 0;
+$errors  = [];
 
 foreach ($interns as $internData) {
     [$nim, $name, $mentorKey] = $internData;
 
-    // Resolve mentor_id
-    $mentorId = null;
-    if ($mentorKey !== null) {
-        $mentorId = $mentorMap[$mentorKey] ?? null;
-        if ($mentorId === null) {
-            $errors[] = "[$nim] $name: Mentor '$mentorKey' tidak ditemukan!";
-        }
+    // Jika mentor null → pakai UNCHECKED
+    $resolvedKey = $mentorKey ?? 'UNCHECKED';
+    $mentorId    = $mentorKeywords[$resolvedKey] ?? null;
+
+    if ($mentorId === null) {
+        $errors[] = "[$nim] $name: Mentor '$resolvedKey' tidak ditemukan!";
+        echo "[ERROR]  NIM $nim | $name: Mentor '$resolvedKey' tidak ditemukan!" . PHP_EOL;
+        continue;
     }
 
-    // Generate email dari NIM
     $email = strtolower($nim) . '@intern.bpjs.com';
 
-    // Cek apakah NIM sudah ada
-    $existingByNim = User::where('nim', $nim)->first();
-    if ($existingByNim) {
-        // Update mentor_id saja jika berbeda
-        if ($existingByNim->mentor_id !== $mentorId) {
-            $existingByNim->update(['mentor_id' => $mentorId]);
-            echo "[UPDATE] NIM $nim ({$existingByNim->name}): mentor_id diupdate ke " . ($mentorId ?? 'NULL') . PHP_EOL;
-            $updated++;
-        } else {
-            echo "[SKIP]   NIM $nim ($name): sudah ada, tidak ada perubahan" . PHP_EOL;
-            $skipped++;
-        }
-        continue;
-    }
-
-    // Cek apakah email sudah ada
-    $existingByEmail = User::where('email', $email)->first();
-    if ($existingByEmail) {
-        echo "[SKIP]   Email $email sudah ada (NIM: {$existingByEmail->nim})" . PHP_EOL;
-        $skipped++;
-        continue;
-    }
-
-    // Buat akun baru
     try {
-        $user = User::create([
+        User::create([
             'name'      => $name,
             'email'     => $email,
             'nim'       => $nim,
-            'password'  => Hash::make($nim), // Password = NIM
+            'password'  => Hash::make($nim),
             'role'      => 'intern',
             'mentor_id' => $mentorId,
         ]);
-        echo "[OK]     NIM $nim | $name | Mentor: " . ($mentorKey ?? 'unchecked') . PHP_EOL;
+        echo "[OK]     NIM $nim | $name | Mentor: $resolvedKey" . PHP_EOL;
         $created++;
     } catch (\Exception $e) {
         $errors[] = "[$nim] $name: " . $e->getMessage();
@@ -357,8 +343,6 @@ echo PHP_EOL;
 echo "==================================================" . PHP_EOL;
 echo "SELESAI!" . PHP_EOL;
 echo "  Berhasil dibuat : $created akun" . PHP_EOL;
-echo "  Diupdate        : $updated akun" . PHP_EOL;
-echo "  Dilewati (skip) : $skipped akun" . PHP_EOL;
 echo "  Error           : " . count($errors) . " akun" . PHP_EOL;
 
 if (!empty($errors)) {
