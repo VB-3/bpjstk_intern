@@ -29,6 +29,9 @@ class DashboardController extends Controller
         $sheetsService = app(\App\Services\GoogleSheetsService::class);
         $bpuLeaderboard = $sheetsService->getLeaderboard();
         $bpuTop3 = $bpuLeaderboard->take(3);
+        $totalAccumulatedBpu = $bpuLeaderboard->isNotEmpty() 
+            ? (int) $bpuLeaderboard->sum('total_bpu') 
+            : (int) $totalBpu;
 
         // Riwayat Tugas: Pisahkan Tugas Aktif dan Tugas Selesai (sudah melewati deadline)
         // 1. Tugas Aktif: is_active = true, tenggat belum terlewat (deadline null atau deadline >= now), dan sudah approved
@@ -64,6 +67,7 @@ class DashboardController extends Controller
             'totalAttendancesToday',
             'totalTasksSubmitted',
             'totalBpu',
+            'totalAccumulatedBpu',
             'totalAssignedTasks',
             'recentUsers',
             'recentSubmissions',

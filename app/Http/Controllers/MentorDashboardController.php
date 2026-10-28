@@ -29,8 +29,11 @@ class MentorDashboardController extends Controller
         $sheetsService = app(\App\Services\GoogleSheetsService::class);
         $bpuLeaderboard = $sheetsService->getLeaderboard();
         $bpuTop3 = $bpuLeaderboard->take(3);
+        $totalAccumulatedBpu = $bpuLeaderboard->isNotEmpty() 
+            ? (int) $bpuLeaderboard->sum('total_bpu') 
+            : (int) $totalBpu;
         
-        return view('mentor.dashboard', compact('interns', 'totalInterns', 'totalAttendancesToday', 'totalTasksSubmitted', 'recentSubmissions', 'totalBpu', 'bpuLeaderboard', 'bpuTop3'));
+        return view('mentor.dashboard', compact('interns', 'totalInterns', 'totalAttendancesToday', 'totalTasksSubmitted', 'recentSubmissions', 'totalBpu', 'totalAccumulatedBpu', 'bpuLeaderboard', 'bpuTop3'));
     }
 }
 

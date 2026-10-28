@@ -286,7 +286,7 @@
 
                     <div class="px-6 py-4 border-t border-gray-100 text-center">
 
-                        <p class="text-xs text-gray-400">Total BPU seluruh peserta: <strong class="text-gray-700">{{ $totalBpu }}</strong> orang</p>
+                        <p class="text-xs text-gray-400">Total BPU seluruh peserta: <strong class="text-gray-700">{{ number_format($totalAccumulatedBpu ?? $totalBpu) }}</strong> BPU</p>
 
                     </div>
 

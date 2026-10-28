@@ -89,7 +89,7 @@
         {{-- ── Stat Cards Row 2: Activity Stats ─────────────────────────── --}}
         <div>
             <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Statistik Aktivitas & Kinerja</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
                 {{-- Total BPU / Leaderboard Card --}}
                 <button type="button" onclick="document.getElementById('modalLeaderboard').classList.remove('hidden')"
                         class="glass-effect rounded-2xl p-5 card-hover flex flex-col justify-between group w-full text-left cursor-pointer border border-amber-100/60 hover:border-amber-300 transition-all">
@@ -118,6 +118,28 @@
                         @endforelse
                     </div>
                 </button>
+
+                {{-- Total Akumulasi BPU Card --}}
+                <div onclick="document.getElementById('modalLeaderboard').classList.remove('hidden')"
+                     title="Klik untuk melihat rincian leaderboard BPU"
+                     class="glass-effect rounded-2xl p-5 card-hover flex items-center gap-4 border border-blue-100/60 hover:border-blue-300 transition-all cursor-pointer">
+                    <div class="stat-icon bg-blue-50 text-blue-600">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight">Total Akumulasi BPU</p>
+                        <div class="flex items-baseline gap-1 mt-0.5">
+                            <p class="text-3xl font-extrabold text-gray-900">{{ number_format($totalAccumulatedBpu) }}</p>
+                            <span class="text-xs font-bold text-gray-400">BPU</span>
+                        </div>
+                        <p class="text-[10px] text-emerald-600 font-medium flex items-center gap-1 mt-0.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Real time Leaderboard
+                        </p>
+                    </div>
+                </div>
 
                 {{-- Hadir Hari Ini --}}
                 <div class="glass-effect rounded-2xl p-5 card-hover flex items-center gap-4">
@@ -225,7 +247,7 @@
 
                 {{-- Footer --}}
                 <div class="px-6 py-4 border-t border-gray-100 text-center">
-                    <p class="text-xs text-gray-400">Total BPU seluruh peserta: <strong class="text-gray-700">{{ $totalBpu }}</strong> orang</p>
+                    <p class="text-xs text-gray-400">Total BPU seluruh peserta: <strong class="text-gray-700">{{ number_format($totalAccumulatedBpu) }}</strong> BPU</p>
                 </div>
             </div>
         </div>
