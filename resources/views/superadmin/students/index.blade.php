@@ -6,12 +6,57 @@
         </h2>
     </x-slot>
 
-    <div class="page-wrapper">
+    <div class="page-wrapper space-y-6">
+
+        {{-- ── Search & Filter Section ──────────────────────────────────── --}}
+        <div class="glass-effect rounded-2xl p-5 shadow-sm">
+            <form method="GET" action="{{ route('superadmin.students.index') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                {{-- Search text input --}}
+                <div class="relative flex-1">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </span>
+                    <input type="text"
+                           name="search"
+                           value="{{ request('search') }}"
+                           placeholder="Cari nama peserta magang, NIM, atau email..."
+                           class="w-full pl-10 pr-4 py-2.5 bg-gray-50/80 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none">
+                </div>
+
+                {{-- Action buttons --}}
+                <div class="flex items-center gap-2">
+                    <button type="submit"
+                            class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-sm shadow-sm transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        Cari
+                    </button>
+                    @if(request()->filled('search'))
+                        <a href="{{ route('superadmin.students.index') }}"
+                           class="inline-flex items-center justify-center px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold rounded-xl text-sm transition-colors">
+                            Reset
+                        </a>
+                    @endif
+                </div>
+            </form>
+        </div>
+
+        {{-- ── Students Table Card ────────────────────────────────────── --}}
         <div class="glass-effect rounded-3xl overflow-hidden shadow-lg border border-white/50">
             <div class="bg-white p-6 sm:px-8 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h3 class="text-xl font-extrabold text-gray-900">Peserta Magang</h3>
-                    <p class="text-sm text-gray-500 mt-1">Daftar seluruh peserta magang, folder Google Drive, dan rekap pencapaian BPU mereka.</p>
+                    <p class="text-sm text-gray-500 mt-1">Daftar seluruh peserta magang, folder Google Drive, dan rekap pencapaian BPU mereka secara real time.</p>
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/70">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Real Time Spreadsheet
+                    </span>
+                    <div class="text-xs font-semibold text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-xl">
+                        Total: <span class="font-extrabold text-gray-800">{{ $students->total() }}</span> peserta
+                    </div>
                 </div>
             </div>
             
@@ -22,7 +67,12 @@
                             <th class="px-6 sm:px-8 py-4">Nama Peserta</th>
                             <th class="px-6 py-4">Mentor Pembimbing</th>
                             <th class="px-6 py-4">Google Drive</th>
-                            <th class="px-6 py-4 text-center">Total BPU</th>
+                            <th class="px-6 py-4 text-center">
+                                <div class="inline-flex items-center gap-1.5 justify-center">
+                                    <span>Total BPU</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" title="Real Time"></span>
+                                </div>
+                            </th>
                             <th class="px-6 sm:px-8 py-4 text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -66,8 +116,9 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-center">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-800">
-                                        {{ number_format($student->todos_sum_bpu_achievement ?? 0, 0, ',', '.') }}
+                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-extrabold bg-green-100 text-green-800 border border-green-200/70">
+                                        {{ number_format($student->realtime_bpu ?? 0, 0, ',', '.') }}
+                                        <span class="text-[10px] font-bold text-green-600">BPU</span>
                                     </span>
                                 </td>
                                 <td class="px-6 sm:px-8 py-4 text-center">
@@ -79,8 +130,16 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-8 py-10 text-center text-gray-500">
-                                    Belum ada peserta magang terdaftar.
+                                <td colspan="5" class="px-8 py-12 text-center text-gray-500">
+                                    <div class="flex flex-col items-center justify-center">
+                                        <svg class="w-12 h-12 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                                        @if(request()->filled('search'))
+                                            <p class="font-semibold text-gray-700">Tidak ada peserta magang yang cocok dengan "{{ request('search') }}"</p>
+                                            <p class="text-xs text-gray-400 mt-1">Coba gunakan kata kunci lain atau reset pencarian.</p>
+                                        @else
+                                            <p class="font-semibold text-gray-700">Belum ada peserta magang terdaftar.</p>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @endforelse
