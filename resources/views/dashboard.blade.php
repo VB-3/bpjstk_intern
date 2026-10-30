@@ -104,7 +104,9 @@
 
                     @forelse($bpuTop3 as $idx => $top)
 
-                        <div class="flex items-center justify-between text-xs py-1.5 px-2.5 rounded-xl bg-gray-50/90 group-hover:bg-amber-50/60 transition-colors">
+                        @php $topIsZero = ((int) ($top->total_bpu ?? 0)) === 0; @endphp
+
+                        <div class="flex items-center justify-between text-xs py-1.5 px-2.5 rounded-xl {{ $topIsZero ? 'bg-red-50 border border-red-200/70' : 'bg-gray-50/90 group-hover:bg-amber-50/60' }} transition-colors">
 
                             <span class="font-semibold text-gray-800 truncate flex items-center gap-2">
 
@@ -114,9 +116,9 @@
 
                             </span>
 
-                            <span class="font-extrabold text-amber-700 shrink-0 ml-2 bg-white border border-amber-200/70 px-2 py-0.5 rounded-lg text-[11px]">
+                            <span class="font-extrabold {{ $topIsZero ? 'text-red-600 bg-red-100 border border-red-200' : 'text-amber-700 bg-white border border-amber-200/70' }} shrink-0 ml-2 px-2 py-0.5 rounded-lg text-[11px]">
 
-                                {{ $top->total_bpu }} <span class="text-[9px] font-semibold text-gray-400">BPU</span>
+                                {{ $top->total_bpu }} <span class="text-[9px] font-semibold {{ $topIsZero ? 'text-red-400' : 'text-gray-400' }}">BPU</span>
 
                             </span>
 
@@ -308,17 +310,19 @@
 
                         @php
 
+                            $isZero = ((int) ($peserta->total_bpu ?? 0)) === 0;
+
                             $medals = ['🥇','🥈','🥉'];
 
-                            $medal = $medals[$rank] ?? null;
+                            $medal = !$isZero ? ($medals[$rank] ?? null) : null;
 
-                            $isTop = $rank < 3;
+                            $isTop = $rank < 3 && !$isZero;
 
                         @endphp
 
                         <div class="flex items-center gap-4 rounded-2xl px-4 py-3
 
-                            {{ $isTop ? 'bg-yellow-50 border border-yellow-200' : 'bg-gray-50 border border-gray-100' }}">
+                            {{ $isZero ? 'bg-red-50 border border-red-200' : ($isTop ? 'bg-yellow-50 border border-yellow-200' : 'bg-gray-50 border border-gray-100') }}">
 
                             {{-- Rank --}}
 
@@ -330,7 +334,7 @@
 
                                 @else
 
-                                    <span class="text-sm font-bold text-gray-400">#{{ $rank + 1 }}</span>
+                                    <span class="text-sm font-bold {{ $isZero ? 'text-red-400' : 'text-gray-400' }}">#{{ $rank + 1 }}</span>
 
                                 @endif
 
@@ -338,7 +342,7 @@
 
                             {{-- Avatar --}}
 
-                            <div class="w-9 h-9 rounded-xl {{ $isTop ? 'bg-yellow-200 text-yellow-800' : 'bg-gray-200 text-gray-600' }} flex items-center justify-center font-extrabold text-sm shrink-0">
+                            <div class="w-9 h-9 rounded-xl {{ $isZero ? 'bg-red-100 text-red-700' : ($isTop ? 'bg-yellow-200 text-yellow-800' : 'bg-gray-200 text-gray-600') }} flex items-center justify-center font-extrabold text-sm shrink-0">
 
                                 {{ strtoupper(substr($peserta->name, 0, 1)) }}
 
@@ -352,11 +356,11 @@
 
                                 @if(!empty($peserta->nim))
 
-                                    <p class="font-mono text-[10px] text-gray-400">{{ $peserta->nim }}</p>
+                                    <p class="font-mono text-[10px] {{ $isZero ? 'text-red-400' : 'text-gray-400' }}">{{ $peserta->nim }}</p>
 
                                 @endif
 
-                                @if($rank === 0)
+                                @if($rank === 0 && !$isZero)
 
                                     <p class="text-[10px] font-bold text-yellow-600 uppercase tracking-wider">Peringkat Pertama 🎉</p>
 
@@ -368,9 +372,9 @@
 
                             <div class="text-right shrink-0">
 
-                                <p class="text-xl font-extrabold {{ $isTop ? 'text-yellow-600' : 'text-gray-700' }}">{{ $peserta->total_bpu }}</p>
+                                <p class="text-xl font-extrabold {{ $isZero ? 'text-red-600' : ($isTop ? 'text-yellow-600' : 'text-gray-700') }}">{{ $peserta->total_bpu }}</p>
 
-                                <p class="text-[10px] text-gray-400 font-medium">BPU</p>
+                                <p class="text-[10px] {{ $isZero ? 'text-red-400' : 'text-gray-400' }} font-medium">BPU</p>
 
                             </div>
 

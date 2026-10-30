@@ -116,9 +116,10 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-center">
-                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-extrabold bg-green-100 text-green-800 border border-green-200/70">
+                                    @php $isStudentBpuZero = ((int) ($student->realtime_bpu ?? 0)) === 0; @endphp
+                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-extrabold {{ $isStudentBpuZero ? 'bg-red-100 text-red-800 border border-red-200/70' : 'bg-green-100 text-green-800 border border-green-200/70' }}">
                                         {{ number_format($student->realtime_bpu ?? 0, 0, ',', '.') }}
-                                        <span class="text-[10px] font-bold text-green-600">BPU</span>
+                                        <span class="text-[10px] font-bold {{ $isStudentBpuZero ? 'text-red-600' : 'text-green-600' }}">BPU</span>
                                     </span>
                                 </td>
                                 <td class="px-6 sm:px-8 py-4 text-center">
