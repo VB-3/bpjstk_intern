@@ -260,6 +260,12 @@
 
                                     <p class="text-xs {{ $isZero ? 'text-red-400' : 'text-gray-400' }} truncate">{{ $peserta->nim ?? $peserta->email ?? '' }}</p>
 
+                                    <div class="flex items-center gap-2 mt-0.5">
+                                        <span class="text-[10px] font-semibold {{ $isZero ? 'text-red-400' : 'text-blue-500' }}">JKK JKM: {{ $peserta->jkk_jkm ?? 0 }}</span>
+                                        <span class="text-[10px] text-gray-300">•</span>
+                                        <span class="text-[10px] font-semibold {{ $isZero ? 'text-red-400' : 'text-purple-500' }}">JKK JKM JHT: {{ $peserta->jkk_jkm_jht ?? 0 }}</span>
+                                    </div>
+
                                 </div>
 
                                 <div class="text-right shrink-0">

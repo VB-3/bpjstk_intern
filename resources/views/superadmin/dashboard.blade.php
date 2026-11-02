@@ -234,6 +234,11 @@
                             <div class="flex-1 min-w-0">
                                 <p class="font-bold text-sm truncate" style="{{ $isZero ? 'color:#b91c1c;' : 'color:#111827;' }}">{{ $peserta->name }}</p>
                                 <p class="text-xs {{ $isZero ? 'text-red-400' : 'text-gray-400' }} truncate">{{ $peserta->nim ?? $peserta->email ?? '' }}</p>
+                                <div class="flex items-center gap-2 mt-0.5">
+                                    <span class="text-[10px] font-semibold {{ $isZero ? 'text-red-400' : 'text-blue-500' }}">JKK JKM: {{ $peserta->jkk_jkm ?? 0 }}</span>
+                                    <span class="text-[10px] text-gray-300">•</span>
+                                    <span class="text-[10px] font-semibold {{ $isZero ? 'text-red-400' : 'text-purple-500' }}">JKK JKM JHT: {{ $peserta->jkk_jkm_jht ?? 0 }}</span>
+                                </div>
                             </div>
                             <div class="text-right shrink-0">
                                 <p class="text-xl font-extrabold {{ $isZero ? 'text-red-600' : ($isTop ? 'text-yellow-600' : 'text-gray-700') }}">{{ $peserta->total_bpu }}</p>

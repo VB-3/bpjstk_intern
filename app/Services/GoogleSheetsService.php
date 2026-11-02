@@ -73,6 +73,8 @@ class GoogleSheetsService
                 $row = str_getcsv($line);
                 $nim = trim($row[0] ?? '');
                 $name = trim($row[1] ?? '');
+                $jkkJkm = trim($row[2] ?? '');
+                $jkkJkmJht = trim($row[3] ?? '');
                 $grandTotal = trim($row[4] ?? '');
 
                 // Abaikan jika baris total atau kosong
@@ -81,9 +83,11 @@ class GoogleSheetsService
                 if (!is_numeric($grandTotal)) continue;
 
                 $results->push((object)[
-                    'nim'       => $nim,
-                    'name'      => $name ?: ($nim ?: 'Peserta Magang'),
-                    'total_bpu' => (int)$grandTotal,
+                    'nim'         => $nim,
+                    'name'        => $name ?: ($nim ?: 'Peserta Magang'),
+                    'total_bpu'   => (int)$grandTotal,
+                    'jkk_jkm'    => is_numeric($jkkJkm) ? (int)$jkkJkm : 0,
+                    'jkk_jkm_jht'=> is_numeric($jkkJkmJht) ? (int)$jkkJkmJht : 0,
                 ]);
             }
 
@@ -107,9 +111,11 @@ class GoogleSheetsService
             ->get()
             ->map(function ($user) {
                 return (object)[
-                    'nim'       => $user->nim,
-                    'name'      => $user->name,
-                    'total_bpu' => $user->todos_sum_bpu_achievement ?? 0,
+                    'nim'         => $user->nim,
+                    'name'        => $user->name,
+                    'total_bpu'   => $user->todos_sum_bpu_achievement ?? 0,
+                    'jkk_jkm'    => 0,
+                    'jkk_jkm_jht'=> 0,
                 ];
             });
     }
