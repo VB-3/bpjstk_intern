@@ -219,7 +219,6 @@
                             $medal = !$isZero ? ($medals[$rank] ?? null) : null;
                             $isTop = $rank < 3 && !$isZero;
                         @endphp
-                        {{-- DEBUG: total_bpu={{ $peserta->total_bpu }}, isZero={{ $isZero ? 'TRUE' : 'FALSE' }} --}}
                         <div class="flex items-center gap-4 rounded-2xl px-4 py-3"
                              style="{{ $isZero ? 'background:#fef2f2;border:1px solid #fecaca;' : ($isTop ? 'background:#fefce8;border:1px solid #fde68a;' : 'background:#f9fafb;border:1px solid #f3f4f6;') }}">
                             <div class="w-8 text-center shrink-0">
