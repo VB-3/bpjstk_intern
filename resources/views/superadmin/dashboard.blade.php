@@ -232,7 +232,7 @@
                                 {{ strtoupper(substr($peserta->name, 0, 1)) }}
                             </div>
                             <div class="flex-1 min-w-0">
-                                <p class="font-bold text-gray-900 text-sm truncate">{{ $peserta->name }}</p>
+                                <p class="font-bold {{ $isZero ? 'text-red-700' : 'text-gray-900' }} text-sm truncate">{{ $peserta->name }}</p>
                                 <p class="text-xs {{ $isZero ? 'text-red-400' : 'text-gray-400' }} truncate">{{ $peserta->nim ?? $peserta->email ?? '' }}</p>
                             </div>
                             <div class="text-right shrink-0">
