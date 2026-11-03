@@ -129,16 +129,22 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                         </svg>
                     </div>
-                    <div>
+                    <div class="min-w-0">
                         <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight">Total Akumulasi BPU</p>
                         <div class="flex items-baseline gap-1 mt-0.5">
                             <p class="text-3xl font-extrabold text-gray-900">{{ number_format($totalAccumulatedBpu) }}</p>
                             <span class="text-xs font-bold text-gray-400">BPU</span>
                         </div>
-                        <p class="text-[10px] text-emerald-600 font-medium flex items-center gap-1 mt-0.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                            Real time Leaderboard
-                        </p>
+                        <div class="mt-1 space-y-0.5 text-[10px] leading-tight">
+                            <p class="font-semibold text-blue-600 flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0"></span>
+                                <span>Total JKK JKM: <strong class="text-gray-800">{{ number_format($totalJkkJkm ?? $bpuLeaderboard->sum('jkk_jkm')) }}</strong></span>
+                            </p>
+                            <p class="font-semibold text-purple-600 flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0"></span>
+                                <span>Total JKK JKM JHT: <strong class="text-gray-800">{{ number_format($totalJkkJkmJht ?? $bpuLeaderboard->sum('jkk_jkm_jht')) }}</strong></span>
+                            </p>
+                        </div>
                     </div>
                 </div>
 

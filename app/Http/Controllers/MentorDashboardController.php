@@ -32,8 +32,10 @@ class MentorDashboardController extends Controller
         $totalAccumulatedBpu = $bpuLeaderboard->isNotEmpty() 
             ? (int) $bpuLeaderboard->sum('total_bpu') 
             : (int) $totalBpu;
+        $totalJkkJkm = (int) $bpuLeaderboard->sum('jkk_jkm');
+        $totalJkkJkmJht = (int) $bpuLeaderboard->sum('jkk_jkm_jht');
         
-        return view('mentor.dashboard', compact('interns', 'totalInterns', 'totalAttendancesToday', 'totalTasksSubmitted', 'recentSubmissions', 'totalBpu', 'totalAccumulatedBpu', 'bpuLeaderboard', 'bpuTop3'));
+        return view('mentor.dashboard', compact('interns', 'totalInterns', 'totalAttendancesToday', 'totalTasksSubmitted', 'recentSubmissions', 'totalBpu', 'totalAccumulatedBpu', 'totalJkkJkm', 'totalJkkJkmJht', 'bpuLeaderboard', 'bpuTop3'));
     }
 }
 

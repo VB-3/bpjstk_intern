@@ -32,6 +32,8 @@ class DashboardController extends Controller
         $totalAccumulatedBpu = $bpuLeaderboard->isNotEmpty() 
             ? (int) $bpuLeaderboard->sum('total_bpu') 
             : (int) $totalBpu;
+        $totalJkkJkm = (int) $bpuLeaderboard->sum('jkk_jkm');
+        $totalJkkJkmJht = (int) $bpuLeaderboard->sum('jkk_jkm_jht');
 
         // Riwayat Tugas: Pisahkan Tugas Aktif dan Tugas Selesai (sudah melewati deadline)
         // 1. Tugas Aktif: is_active = true, tenggat belum terlewat (deadline null atau deadline >= now), dan sudah approved
@@ -68,6 +70,8 @@ class DashboardController extends Controller
             'totalTasksSubmitted',
             'totalBpu',
             'totalAccumulatedBpu',
+            'totalJkkJkm',
+            'totalJkkJkmJht',
             'totalAssignedTasks',
             'recentUsers',
             'recentSubmissions',
