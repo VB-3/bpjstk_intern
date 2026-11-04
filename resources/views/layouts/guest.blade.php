@@ -1,5 +1,5 @@
 @php
-    $isFixed = $fixed || request()->routeIs('login') || request()->routeIs('password.request');
+    $isFixed = (!empty($fixed)) || request()->routeIs('login') || request()->routeIs('password.request');
 @endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="{{ $isFixed ? 'h-full overflow-hidden' : '' }}">
@@ -21,44 +21,52 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-gray-900 antialiased bg-gray-50 selection:bg-green-500 selection:text-white {{ $isFixed ? 'h-screen h-[100dvh] overflow-hidden overscroll-none' : 'min-h-screen min-h-[100dvh]' }}">
-        <div class="{{ $isFixed ? 'h-full flex overflow-hidden' : 'min-h-screen min-h-[100dvh] flex' }}">
-            <!-- Left Side: Visual / Branding -->
-            <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-green-700 to-green-900 items-center justify-center relative overflow-hidden h-full">
-                <!-- Abstract Background Elements -->
-                <div class="absolute top-0 left-0 w-full h-full opacity-10">
-                    <svg class="absolute transform -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2" width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="400" cy="400" r="400" fill="white"/>
-                    </svg>
+    <body class="font-sans text-gray-900 antialiased selection:bg-green-500 selection:text-white {{ $isFixed ? 'h-screen h-[100dvh] overflow-hidden overscroll-none' : 'min-h-screen min-h-[100dvh]' }} bg-cover bg-center bg-no-repeat bg-fixed relative"
+          style="background-image: url('{{ asset('images/background_login.png') }}');">
+        
+        <!-- Subtle dark & blur overlay to ensure contrast and modern glass feel -->
+        <div class="absolute inset-0 bg-gradient-to-r from-black/40 via-black/20 to-slate-900/40 backdrop-blur-[0.5px]"></div>
+
+        <div class="{{ $isFixed ? 'h-full flex overflow-hidden' : 'min-h-screen min-h-[100dvh] flex' }} relative z-10">
+            <!-- Left Side: Visual / Branding Area (lets workers in the photo shine) -->
+            <div class="hidden lg:flex lg:w-7/12 flex-col justify-between p-10 xl:p-14">
+                <!-- Top Brand Badge -->
+                <div>
+                    <div class="inline-flex items-center gap-3 bg-white/90 backdrop-blur-md px-5 py-2.5 rounded-2xl shadow-md border border-white/60">
+                        <img src="{{ asset('images/logo bpjstk.png') }}" alt="Logo BPJS Ketenagakerjaan" class="h-8 object-contain">
+                    </div>
                 </div>
-                
-                <div class="relative z-10 px-12 text-center text-white">
-                    <img src="{{ asset('images/logo bpjstk.png') }}" alt="Logo BPJS Ketenagakerjaan" class="h-28 mx-auto mb-8 drop-shadow-lg object-contain mix-blend-multiply">
-                    <h1 class="text-4xl font-bold mb-4 tracking-tight">Portal Magang Resmi</h1>
-                    <p class="text-green-100 text-lg max-w-md mx-auto">Sistem terpadu untuk pencatatan absensi, pengelolaan tugas, dan pelaporan kegiatan peserta magang BPJS Ketenagakerjaan.</p>
+
+                <!-- Bottom Glass Card -->
+                <div class="max-w-lg bg-black/45 backdrop-blur-md p-7 rounded-3xl border border-white/20 text-white shadow-2xl">
+                    <span class="inline-block px-3 py-1 bg-green-500/90 text-white text-xs font-semibold rounded-full uppercase tracking-wider mb-3">
+                        BPJS Ketenagakerjaan
+                    </span>
+                    <h1 class="text-3xl font-extrabold tracking-tight mb-2 text-white drop-shadow-sm">Portal Magang Resmi</h1>
+                    <p class="text-sm text-gray-100 leading-relaxed drop-shadow-sm">
+                        Sistem terpadu untuk pencatatan absensi, pengelolaan tugas, dan pelaporan kegiatan peserta magang.
+                    </p>
                 </div>
             </div>
 
             <!-- Right Side: Form Content -->
-            <div class="w-full lg:w-1/2 flex flex-col justify-center items-center px-4 py-3 sm:px-8 sm:py-6 relative {{ $isFixed ? 'h-full overflow-hidden overscroll-none' : 'min-h-screen min-h-[100dvh] overflow-y-auto' }}">
-                <!-- Mobile Logo -->
-                <div class="lg:hidden mb-4 sm:mb-6 shrink-0">
-                    <a href="/">
-                        <img src="{{ asset('images/logo bpjstk.png') }}" alt="Logo BPJS" class="h-16 sm:h-20 mx-auto object-contain mix-blend-multiply">
-                    </a>
-                </div>
-
-                <div class="w-full max-w-md sm:max-w-lg shrink-0">
+            <div class="w-full lg:w-5/12 flex flex-col justify-center items-center px-4 py-6 sm:px-8 relative {{ $isFixed ? 'h-full overflow-hidden overscroll-none' : 'min-h-screen min-h-[100dvh] overflow-y-auto' }}">
+                <div class="w-full max-w-md shrink-0">
                     <!-- The Form Area -->
-                    <div class="bg-white/80 backdrop-blur-xl shadow-xl sm:shadow-2xl rounded-2xl sm:rounded-3xl p-6 sm:p-9 border border-gray-100 relative">
+                    <div class="bg-white/95 backdrop-blur-xl shadow-2xl rounded-3xl p-6 sm:p-9 border border-white/80 relative">
                         <!-- Decorative top accent -->
                         <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-1/3 h-1 bg-green-500 rounded-b-lg"></div>
+
+                        <!-- Brand Logo for card (visible on all screens) -->
+                        <div class="flex justify-center mb-6">
+                            <img src="{{ asset('images/logo bpjstk.png') }}" alt="Logo BPJS Ketenagakerjaan" class="h-10 sm:h-12 object-contain">
+                        </div>
                         
                         {{ $slot }}
                     </div>
                 </div>
                 
-                <p class="mt-3 sm:mt-4 text-[11px] sm:text-xs text-gray-500 text-center shrink-0">
+                <p class="mt-4 text-xs text-white/90 font-medium text-center drop-shadow shrink-0">
                     &copy; {{ date('Y') }} BPJS Ketenagakerjaan
                 </p>
             </div>
