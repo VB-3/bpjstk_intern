@@ -21,11 +21,16 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-gray-900 antialiased selection:bg-green-500 selection:text-white {{ $isFixed ? 'h-screen h-[100dvh] overflow-hidden overscroll-none' : 'min-h-screen min-h-[100dvh]' }} bg-cover bg-center bg-no-repeat bg-fixed relative"
-          style="background-image: url('{{ asset('images/background_login.png') }}');">
+    <body class="font-sans text-gray-900 antialiased selection:bg-green-500 selection:text-white {{ $isFixed ? 'h-screen h-[100dvh] overflow-hidden overscroll-none' : 'min-h-screen min-h-[100dvh]' }} relative">
         
-        <!-- Subtle dark & blur overlay to ensure contrast and modern glass feel -->
-        <div class="absolute inset-0 bg-gradient-to-r from-black/40 via-black/20 to-slate-900/40 backdrop-blur-[0.5px]"></div>
+        <!-- Background Wallpaper Container (Full Screen Image with Overlay) -->
+        <div class="fixed inset-0 w-full h-full -z-10 overflow-hidden pointer-events-none select-none">
+            <img src="{{ asset('images/background_login.png') }}"
+                 alt="Background BPJS Ketenagakerjaan"
+                 class="w-full h-full object-cover object-left lg:object-center" />
+            <!-- Dark Gradient Overlay for contrast -->
+            <div class="absolute inset-0 bg-gradient-to-r from-black/50 via-black/25 to-slate-900/50 backdrop-blur-[0.5px]"></div>
+        </div>
 
         <div class="{{ $isFixed ? 'h-full flex overflow-hidden' : 'min-h-screen min-h-[100dvh] flex' }} relative z-10">
             <!-- Left Side: Visual / Branding Area (lets workers in the photo shine) -->
