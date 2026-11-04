@@ -34,21 +34,13 @@
 
         <div class="{{ $isFixed ? 'h-full flex overflow-hidden' : 'min-h-screen min-h-[100dvh] flex' }} relative z-10">
             <!-- Left Side: Visual / Branding Area (lets workers in the photo shine) -->
-            <div class="hidden lg:flex lg:w-7/12 flex-col justify-between p-10 xl:p-14">
-                <!-- Top Brand Badge -->
-                <div>
-                    <div class="inline-flex items-center gap-3 bg-white/90 backdrop-blur-md px-5 py-2.5 rounded-2xl shadow-md border border-white/60">
-                        <img src="{{ asset('images/logo bpjstk.png') }}" alt="Logo BPJS Ketenagakerjaan" class="h-8 object-contain">
-                    </div>
-                </div>
-
-                <!-- Bottom Glass Card -->
-                <div class="max-w-lg bg-black/45 backdrop-blur-md p-7 rounded-3xl border border-white/20 text-white shadow-2xl">
-                    <span class="inline-block px-3 py-1 bg-green-500/90 text-white text-xs font-semibold rounded-full uppercase tracking-wider mb-3">
-                        BPJS Ketenagakerjaan
-                    </span>
-                    <h1 class="text-3xl font-extrabold tracking-tight mb-2 text-white drop-shadow-sm">Portal Magang Resmi</h1>
-                    <p class="text-sm text-gray-100 leading-relaxed drop-shadow-sm">
+            <div class="hidden lg:flex lg:w-7/12 flex-col justify-center p-10 xl:p-16">
+                <!-- Text only (vertically centered, no background box) -->
+                <div class="max-w-xl text-white">
+                    <h1 class="text-4xl xl:text-5xl font-extrabold tracking-tight mb-4 drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
+                        Portal Magang Resmi
+                    </h1>
+                    <p class="text-base xl:text-lg text-white font-medium leading-relaxed drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)] max-w-lg">
                         Sistem terpadu untuk pencatatan absensi, pengelolaan tugas, dan pelaporan kegiatan peserta magang.
                     </p>
                 </div>
