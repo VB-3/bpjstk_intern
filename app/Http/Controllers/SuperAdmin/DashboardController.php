@@ -27,13 +27,14 @@ class DashboardController extends Controller
 
         // Leaderboard BPU realtime dari Google Spreadsheet
         $sheetsService = app(\App\Services\GoogleSheetsService::class);
-        $bpuLeaderboard = $sheetsService->getLeaderboard();
+        $bpuLeaderboardAll  = $sheetsService->getLeaderboard();          // data penuh → untuk total
+        $bpuLeaderboard     = $sheetsService->getLeaderboardForDisplay(); // data terfilter → untuk tampilan
         $bpuTop3 = $bpuLeaderboard->take(3);
-        $totalAccumulatedBpu = $bpuLeaderboard->isNotEmpty() 
-            ? (int) $bpuLeaderboard->sum('total_bpu') 
+        $totalAccumulatedBpu = $bpuLeaderboardAll->isNotEmpty()
+            ? (int) $bpuLeaderboardAll->sum('total_bpu')
             : (int) $totalBpu;
-        $totalJkkJkm = (int) $bpuLeaderboard->sum('jkk_jkm');
-        $totalJkkJkmJht = (int) $bpuLeaderboard->sum('jkk_jkm_jht');
+        $totalJkkJkm    = (int) $bpuLeaderboardAll->sum('jkk_jkm');
+        $totalJkkJkmJht = (int) $bpuLeaderboardAll->sum('jkk_jkm_jht');
 
         // Riwayat Tugas: Pisahkan Tugas Aktif dan Tugas Selesai (sudah melewati deadline)
         // 1. Tugas Aktif: is_active = true, tenggat belum terlewat (deadline null atau deadline >= now), dan sudah approved

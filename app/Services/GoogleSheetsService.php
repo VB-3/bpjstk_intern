@@ -35,7 +35,7 @@ class GoogleSheetsService
     /**
      * Cek apakah nama tertentu dikecualikan dari leaderboard.
      */
-    protected function isExcludedFromLeaderboard(string $name): bool
+    public function isExcludedFromLeaderboard(string $name): bool
     {
         $nameLower = mb_strtolower(trim($name));
         foreach ($this->excludedFromLeaderboard as $excluded) {
@@ -75,6 +75,17 @@ class GoogleSheetsService
         });
     }
 
+    /**
+     * Mengambil data leaderboard untuk DITAMPILKAN — nama yang dikecualikan disembunyikan,
+     * tetapi total BPU di dashboard tetap dihitung dari getLeaderboard() (data penuh).
+     */
+    public function getLeaderboardForDisplay()
+    {
+        return $this->getLeaderboard()
+            ->filter(fn($item) => !$this->isExcludedFromLeaderboard($item->name))
+            ->values();
+    }
+
     protected function fetchLeaderboardFromSheet()
     {
         try {
@@ -112,9 +123,6 @@ class GoogleSheetsService
                 if (stripos($name, 'total') !== false || stripos($nim, 'total') !== false) continue;
                 if (!is_numeric($grandTotal)) continue;
 
-                // Abaikan peserta yang dikecualikan dari leaderboard
-                if ($this->isExcludedFromLeaderboard($name)) continue;
-
                 $results->push((object)[
                     'nim'         => $nim,
                     'name'        => $name ?: ($nim ?: 'Peserta Magang'),
@@ -142,7 +150,6 @@ class GoogleSheetsService
             ->withSum('todos', 'bpu_achievement')
             ->orderByDesc('todos_sum_bpu_achievement')
             ->get()
-            ->filter(fn($user) => !$this->isExcludedFromLeaderboard($user->name))
             ->map(function ($user) {
                 return (object)[
                     'nim'         => $user->nim,
