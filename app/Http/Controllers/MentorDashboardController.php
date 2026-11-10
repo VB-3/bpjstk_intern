@@ -27,13 +27,14 @@ class MentorDashboardController extends Controller
         $totalBpu = \App\Models\Todo::whereIn('user_id', $internIds)->sum('bpu_achievement');
 
         $sheetsService = app(\App\Services\GoogleSheetsService::class);
-        $bpuLeaderboard = $sheetsService->getLeaderboard();
+        $bpuLeaderboardAll = $sheetsService->getLeaderboard();
+        $bpuLeaderboard = $sheetsService->getLeaderboardForDisplay();
         $bpuTop3 = $bpuLeaderboard->take(3);
-        $totalAccumulatedBpu = $bpuLeaderboard->isNotEmpty() 
-            ? (int) $bpuLeaderboard->sum('total_bpu') 
+        $totalAccumulatedBpu = $bpuLeaderboardAll->isNotEmpty() 
+            ? (int) $bpuLeaderboardAll->sum('total_bpu') 
             : (int) $totalBpu;
-        $totalJkkJkm = (int) $bpuLeaderboard->sum('jkk_jkm');
-        $totalJkkJkmJht = (int) $bpuLeaderboard->sum('jkk_jkm_jht');
+        $totalJkkJkm = (int) $bpuLeaderboardAll->sum('jkk_jkm');
+        $totalJkkJkmJht = (int) $bpuLeaderboardAll->sum('jkk_jkm_jht');
         
         return view('mentor.dashboard', compact('interns', 'totalInterns', 'totalAttendancesToday', 'totalTasksSubmitted', 'recentSubmissions', 'totalBpu', 'totalAccumulatedBpu', 'totalJkkJkm', 'totalJkkJkmJht', 'bpuLeaderboard', 'bpuTop3'));
     }

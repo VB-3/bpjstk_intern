@@ -22,11 +22,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Leaderboard BPU realtime dari Google Spreadsheet
         $sheetsService = app(\App\Services\GoogleSheetsService::class);
-        $bpuLeaderboard = $sheetsService->getLeaderboard();
+        $bpuLeaderboardAll = $sheetsService->getLeaderboard();
+        $bpuLeaderboard = $sheetsService->getLeaderboardForDisplay();
         $bpuTop3 = $bpuLeaderboard->take(3);
 
         // Total BPU user dari spreadsheet (berdasarkan NIM), fallback ke DB
-        $myBpu = $bpuLeaderboard->firstWhere('nim', auth()->user()->nim);
+        $myBpu = $bpuLeaderboardAll->firstWhere('nim', auth()->user()->nim);
         $totalBpu = $myBpu ? $myBpu->total_bpu : \App\Models\Todo::where('user_id', auth()->id())->sum('bpu_achievement');
 
         // Jumlah tugas aktif yang belum dikumpulkan intern ini
@@ -44,7 +45,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Route leaderboard BPU (accessible oleh semua role)
     Route::get('/leaderboard/bpu', function () {
-        $bpuLeaderboard = app(\App\Services\GoogleSheetsService::class)->getLeaderboard();
+        $bpuLeaderboard = app(\App\Services\GoogleSheetsService::class)->getLeaderboardForDisplay();
         return response()->json($bpuLeaderboard->map(fn($u) => ['name' => $u->name, 'nim' => $u->nim, 'total_bpu' => $u->total_bpu]));
     })->name('leaderboard.bpu');
 
