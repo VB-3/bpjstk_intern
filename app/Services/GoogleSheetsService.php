@@ -70,7 +70,7 @@ class GoogleSheetsService
      */
     public function getLeaderboard()
     {
-        return Cache::remember('google_sheets_leaderboard', 30, function () {
+        return Cache::remember('google_sheets_leaderboard', 300, function () {
             return $this->fetchLeaderboardFromSheet();
         });
     }
