@@ -163,7 +163,8 @@
         <x-security-guard />
 
         {{-- 💬 Floating Chat Button --}}
-        <div x-data="{ tooltip: false }" class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
+        <div x-data="{ tooltip: false }"
+             style="position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem;">
 
             {{-- Tooltip label --}}
             <div x-show="tooltip"
@@ -173,9 +174,9 @@
                  x-transition:leave="transition ease-in duration-150"
                  x-transition:leave-start="opacity-100 translate-y-0"
                  x-transition:leave-end="opacity-0 translate-y-1"
-                 class="bg-gray-900 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap pointer-events-none">
+                 style="position: relative; background:#111827; color:#fff; font-size:0.75rem; font-weight:600; padding:0.375rem 0.75rem; border-radius:0.5rem; box-shadow:0 4px 12px rgba(0,0,0,0.15); white-space:nowrap; pointer-events:none;">
                 💬 Tanya Admin
-                <div class="absolute bottom-[-5px] right-5 w-2.5 h-2.5 bg-gray-900 rotate-45"></div>
+                <span style="position:absolute; bottom:-4px; right:1.25rem; width:10px; height:10px; background:#111827; transform:rotate(45deg); display:block;"></span>
             </div>
 
             {{-- Chat Button --}}
@@ -184,18 +185,26 @@
                rel="noopener noreferrer"
                @mouseenter="tooltip = true"
                @mouseleave="tooltip = false"
-               class="relative flex items-center justify-center w-14 h-14 rounded-full bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110 active:scale-95 group"
+               style="position:relative; display:flex; align-items:center; justify-content:center; width:3.5rem; height:3.5rem; border-radius:9999px; background:#16a34a; box-shadow:0 8px 24px rgba(22,163,74,0.4); text-decoration:none; transition: transform 0.2s, box-shadow 0.2s;"
+               onmouseover="this.style.transform='scale(1.12)'; this.style.background='#15803d';"
+               onmouseout="this.style.transform='scale(1)'; this.style.background='#16a34a';"
                aria-label="Chat dengan Admin">
 
                 {{-- Pulse ring --}}
-                <span class="absolute inset-0 rounded-full bg-green-500 opacity-30 animate-ping"></span>
+                <span style="position:absolute; inset:0; border-radius:9999px; background:#22c55e; opacity:0.35; animation:ping 1.5s cubic-bezier(0,0,0.2,1) infinite;"></span>
 
                 {{-- Chat icon --}}
-                <svg class="w-7 h-7 text-white relative z-10" fill="currentColor" viewBox="0 0 24 24">
+                <svg style="width:1.75rem; height:1.75rem; color:#fff; fill:#fff; position:relative; z-index:1;" viewBox="0 0 24 24">
                     <path d="M20 2H4C2.9 2 2 2.9 2 4v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
                 </svg>
             </a>
         </div>
+
+        <style>
+            @keyframes ping {
+                75%, 100% { transform: scale(1.8); opacity: 0; }
+            }
+        </style>
 
     </body>
 </html>
