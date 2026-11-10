@@ -175,7 +175,7 @@
                  x-transition:leave-start="opacity-100 translate-y-0"
                  x-transition:leave-end="opacity-0 translate-y-1"
                  style="position: relative; background:#111827; color:#fff; font-size:0.75rem; font-weight:600; padding:0.375rem 0.75rem; border-radius:0.5rem; box-shadow:0 4px 12px rgba(0,0,0,0.15); white-space:nowrap; pointer-events:none;">
-                💬 Tanya Admin
+                💬 Ayo Tanya SAPA!
                 <span style="position:absolute; bottom:-4px; right:1.25rem; width:10px; height:10px; background:#111827; transform:rotate(45deg); display:block;"></span>
             </div>
 
