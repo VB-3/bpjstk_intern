@@ -57,6 +57,29 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/attendances/checkin', [\App\Http\Controllers\AttendanceController::class, 'checkIn'])->name('attendances.checkin');
     Route::post('/attendances/checkout', [\App\Http\Controllers\AttendanceController::class, 'checkOut'])->name('attendances.checkout');
 
+    // Route untuk melihat foto absensi milik sendiri
+    Route::get('/attendances/photo/{attendance}/{type}', function (\App\Models\Attendance $attendance, string $type) {
+        // Pastikan hanya pemilik foto atau superadmin/mentor yang bisa akses
+        if (auth()->id() !== $attendance->user_id && !auth()->user()->isSuperAdmin() && !auth()->user()->isMentor()) {
+            abort(403, 'Anda tidak berhak melihat foto ini.');
+        }
+
+        $path = match($type) {
+            'checkin'  => $attendance->check_in_photo,
+            'checkout' => $attendance->check_out_photo,
+            default    => null,
+        };
+
+        if (!$path || !\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+            abort(404, 'Foto tidak ditemukan.');
+        }
+
+        $fullPath = \Illuminate\Support\Facades\Storage::disk('public')->path($path);
+        $mimeType = mime_content_type($fullPath) ?: 'image/jpeg';
+
+        return response()->file($fullPath, ['Content-Type' => $mimeType]);
+    })->name('attendances.photo');
+
     Route::get('/todos', [\App\Http\Controllers\TodoController::class, 'index'])->name('todos.index');
     Route::post('/todos', [\App\Http\Controllers\TodoController::class, 'store'])->name('todos.store');
     Route::put('/todos/{todo}/bpu', [\App\Http\Controllers\TodoController::class, 'updateBpu'])->name('todos.updateBpu');

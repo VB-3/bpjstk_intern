@@ -136,7 +136,7 @@
                                             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Check In</p>
                                             @if($attendance->check_in_time)
                                                 <p class="text-sm font-extrabold text-green-600">{{ \Carbon\Carbon::parse($attendance->check_in_time)->format('H:i') }}</p>
-                                                <a href="{{ Storage::url($attendance->check_in_photo) }}" target="_blank"
+                                                <a href="{{ route('attendances.photo', [$attendance->id, 'checkin']) }}" target="_blank"
                                                    class="text-[11px] text-blue-500 hover:text-blue-700 font-semibold hover:underline">Foto</a>
                                             @else
                                                 <p class="text-sm font-extrabold text-gray-300">--:--</p>
@@ -147,7 +147,7 @@
                                             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Check Out</p>
                                             @if($attendance->check_out_time)
                                                 <p class="text-sm font-extrabold text-red-500">{{ \Carbon\Carbon::parse($attendance->check_out_time)->format('H:i') }}</p>
-                                                <a href="{{ Storage::url($attendance->check_out_photo) }}" target="_blank"
+                                                <a href="{{ route('attendances.photo', [$attendance->id, 'checkout']) }}" target="_blank"
                                                    class="text-[11px] text-blue-500 hover:text-blue-700 font-semibold hover:underline">Foto</a>
                                             @else
                                                 <p class="text-sm font-extrabold text-gray-300">--:--</p>
