@@ -40,6 +40,21 @@
 
                 {{-- Form Body --}}
                 <div class="p-6 sm:p-8 bg-white/80">
+                    {{-- Error Alert Summary --}}
+                    @if($errors->any())
+                        <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl text-sm text-red-700 space-y-1">
+                            <p class="font-bold flex items-center gap-1.5 text-red-800">
+                                <svg class="w-4 h-4 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                Terjadi kesalahan pengisian formulir:
+                            </p>
+                            <ul class="list-disc pl-5 text-xs text-red-600 space-y-0.5">
+                                @foreach($errors->all() as $err)
+                                    <li>{{ $err }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
                     <form method="POST" action="{{ route('superadmin.users.update', $user) }}" class="space-y-6" id="edit-user-form">
                         @csrf
                         @method('PUT')
@@ -89,27 +104,23 @@
                         <div id="field-intern-extra" class="{{ old('role', $user->role) !== 'intern' ? 'hidden' : '' }} space-y-4">
                             {{-- NIM --}}
                             <div>
-                                <x-input-label for="nim" :value="__('NIM (9 Digit)')" class="font-bold text-gray-700" />
+                                <x-input-label for="nim" :value="__('NIM')" class="font-bold text-gray-700" />
                                 <x-text-input id="nim"
                                               name="nim"
                                               type="text"
                                               class="block w-full mt-1.5 border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-500 rounded-xl shadow-sm transition-colors text-sm py-2.5 px-4"
                                               :value="old('nim', $user->nim)"
-                                              maxlength="9"
-                                              minlength="9"
-                                              inputmode="numeric"
-                                              oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,9)"
-                                              placeholder="9 digit angka" />
+                                              placeholder="Nomor Induk Mahasiswa (NIM)" />
                                 <x-input-error :messages="$errors->get('nim')" class="mt-2" />
                             </div>
 
                             {{-- Mentor --}}
                             <div>
-                                <x-input-label for="mentor_id" :value="__('Pilih Mentor')" class="font-bold text-gray-700" />
+                                <x-input-label for="mentor_id" :value="__('Pilih Mentor (Opsional)')" class="font-bold text-gray-700" />
                                 <select id="mentor_id"
                                         name="mentor_id"
                                         class="block w-full mt-1.5 border border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-500 rounded-xl shadow-sm transition-colors text-sm py-2.5 px-4 font-medium text-gray-700 outline-none">
-                                    <option value="">-- Pilih Mentor --</option>
+                                    <option value="">-- Tanpa Mentor / Pilih Nanti --</option>
                                     @foreach($mentors as $mentor)
                                         <option value="{{ $mentor->id }}" {{ old('mentor_id', $user->mentor_id) == $mentor->id ? 'selected' : '' }}>{{ $mentor->name }}</option>
                                     @endforeach
@@ -119,13 +130,13 @@
                         </div>
 
                         {{-- Password Section with Info Alert --}}
-                        <div class="pt-2 border-t border-gray-100 space-y-4">
+                        <div class="pt-2 border-t border-gray-100 space-y-4" x-data="{ showPass: false }">
                             <div class="p-3.5 bg-amber-50/80 border border-amber-200/80 rounded-2xl flex items-start gap-2.5">
                                 <svg class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
                                 <p class="text-xs text-amber-800 leading-relaxed font-medium">
-                                    <span class="font-bold">Perubahan Kata Sandi:</span> Kosongkan kolom kata sandi di bawah jika Anda tidak ingin mengubah kata sandi pengguna saat ini.
+                                    <span class="font-bold">Perubahan Kata Sandi:</span> Kosongkan kolom kata sandi di bawah jika Anda tidak ingin mengubah kata sandi pengguna saat ini. Jika diisi, minimal 6 karakter.
                                 </p>
                             </div>
 
@@ -134,10 +145,10 @@
                                 <x-input-label for="password" :value="__('Kata Sandi Baru (Opsional)')" class="font-bold text-gray-700" />
                                 <x-text-input id="password"
                                               name="password"
-                                              type="password"
+                                              ::type="showPass ? 'text' : 'password'"
                                               class="block w-full mt-1.5 border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-500 rounded-xl shadow-sm transition-colors text-sm py-2.5 px-4"
                                               autocomplete="new-password"
-                                              placeholder="Kosongkan jika tidak ingin mengubah password" />
+                                              placeholder="Minimal 6 karakter (kosongkan jika tidak diubah)" />
                                 <x-input-error :messages="$errors->get('password')" class="mt-2" />
                             </div>
 
@@ -146,11 +157,17 @@
                                 <x-input-label for="password_confirmation" :value="__('Konfirmasi Kata Sandi Baru')" class="font-bold text-gray-700" />
                                 <x-text-input id="password_confirmation"
                                               name="password_confirmation"
-                                              type="password"
+                                              ::type="showPass ? 'text' : 'password'"
                                               class="block w-full mt-1.5 border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-500 rounded-xl shadow-sm transition-colors text-sm py-2.5 px-4"
                                               autocomplete="new-password"
-                                              placeholder="Ulangi kata sandi baru" />
+                                              placeholder="Ketik ulang kata sandi baru yang sama" />
                                 <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+                            </div>
+
+                            {{-- Show/Hide password toggle --}}
+                            <div class="flex items-center gap-2 pt-1">
+                                <input type="checkbox" id="toggle_show_pass" x-model="showPass" class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-500">
+                                <label for="toggle_show_pass" class="text-xs text-gray-600 font-medium select-none cursor-pointer">Lihat teks kata sandi</label>
                             </div>
                         </div>
 
@@ -185,7 +202,7 @@
                 internExtra.classList.remove('hidden');
                 emailInput.removeAttribute('required');
                 nimInput.setAttribute('required', '');
-                mentorInput.setAttribute('required', '');
+                mentorInput.removeAttribute('required');
             } else {
                 emailField.classList.remove('hidden');
                 internExtra.classList.add('hidden');

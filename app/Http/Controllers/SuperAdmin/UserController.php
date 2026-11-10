@@ -45,21 +45,30 @@ class UserController extends Controller
         $rules = [
             'name'     => 'required|string|max:255',
             'role'     => 'required|in:intern,mentor,super_admin',
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'password' => ['required', 'confirmed', 'min:6'],
         ];
 
-        $messages = [];
+        $messages = [
+            'name.required'      => 'Nama wajib diisi.',
+            'role.required'      => 'Peran (Role) wajib dipilih.',
+            'password.required'  => 'Kata sandi wajib diisi.',
+            'password.min'       => 'Kata sandi minimal harus 6 karakter.',
+            'password.confirmed' => 'Konfirmasi kata sandi tidak cocok. Harap masukkan kata sandi yang sama di kedua kolom.',
+        ];
 
         if ($isIntern) {
-            // Intern: NIM wajib, email tidak diperlukan
-            $rules['nim']       = 'required|digits:9|unique:users';
-            $rules['mentor_id'] = 'required|exists:users,id';
-            $messages['nim.required'] = 'NIM wajib diisi.';
-            $messages['nim.digits']   = 'NIM harus tepat 9 angka.';
-            $messages['nim.unique']   = 'NIM sudah terdaftar.';
+            // Intern: NIM wajib
+            $rules['nim']       = 'required|string|max:30|unique:users,nim';
+            $rules['mentor_id'] = 'nullable|exists:users,id';
+            $messages['nim.required']     = 'NIM wajib diisi.';
+            $messages['nim.unique']       = 'NIM sudah terdaftar.';
+            $messages['mentor_id.exists'] = 'Mentor yang dipilih tidak valid.';
         } else {
             // Mentor / Super Admin: email wajib
-            $rules['email'] = 'required|string|email|max:255|unique:users';
+            $rules['email'] = 'required|string|email|max:255|unique:users,email';
+            $messages['email.required'] = 'Email wajib diisi.';
+            $messages['email.email']    = 'Format email tidak valid.';
+            $messages['email.unique']   = 'Email sudah terdaftar.';
         }
 
         $request->validate($rules, $messages);
@@ -71,10 +80,12 @@ class UserController extends Controller
         ];
 
         if ($isIntern) {
-            $data['nim']       = $request->nim;
-            $data['mentor_id'] = $request->mentor_id;
+            $data['nim']       = trim($request->nim);
+            $data['mentor_id'] = $request->filled('mentor_id') ? $request->mentor_id : null;
+            // Gunakan email jika diisi, jika kosong gunakan default dari NIM agar database aman
+            $data['email']     = $request->filled('email') ? trim($request->email) : (trim($request->nim) . '@intern.bpjs');
         } else {
-            $data['email'] = $request->email;
+            $data['email'] = trim($request->email);
         }
 
         User::create($data);
@@ -95,19 +106,27 @@ class UserController extends Controller
         $rules = [
             'name'     => 'required|string|max:255',
             'role'     => 'required|in:intern,mentor,super_admin',
-            'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
+            'password' => ['nullable', 'confirmed', 'min:6'],
         ];
 
-        $messages = [];
+        $messages = [
+            'name.required'      => 'Nama wajib diisi.',
+            'role.required'      => 'Peran (Role) wajib dipilih.',
+            'password.min'       => 'Kata sandi minimal harus 6 karakter.',
+            'password.confirmed' => 'Konfirmasi kata sandi tidak cocok. Harap masukkan kata sandi yang sama di kedua kolom.',
+        ];
 
         if ($isIntern) {
-            $rules['nim']       = 'required|digits:9|unique:users,nim,' . $user->id;
-            $rules['mentor_id'] = 'required|exists:users,id';
-            $messages['nim.required'] = 'NIM wajib diisi.';
-            $messages['nim.digits']   = 'NIM harus tepat 9 angka.';
-            $messages['nim.unique']   = 'NIM sudah terdaftar.';
+            $rules['nim']       = 'required|string|max:30|unique:users,nim,' . $user->id;
+            $rules['mentor_id'] = 'nullable|exists:users,id';
+            $messages['nim.required']     = 'NIM wajib diisi.';
+            $messages['nim.unique']       = 'NIM sudah terdaftar untuk pengguna lain.';
+            $messages['mentor_id.exists'] = 'Mentor yang dipilih tidak valid.';
         } else {
             $rules['email'] = 'required|string|email|max:255|unique:users,email,' . $user->id;
+            $messages['email.required'] = 'Email wajib diisi.';
+            $messages['email.email']    = 'Format email tidak valid.';
+            $messages['email.unique']   = 'Email sudah terdaftar untuk pengguna lain.';
         }
 
         $request->validate($rules, $messages);
@@ -118,12 +137,20 @@ class UserController extends Controller
         ];
 
         if ($isIntern) {
-            $data['nim']       = $request->nim;
-            $data['mentor_id'] = $request->mentor_id;
-            $data['email']     = null; // hapus email jika diubah ke intern
+            $data['nim']       = trim($request->nim);
+            $data['mentor_id'] = $request->filled('mentor_id') ? $request->mentor_id : null;
+            
+            // JANGAN hapus email! Pertahankan email yang sudah ada jika tidak diisi,
+            // atau gunakan email baru jika diinputkan, atau fallback ke NIM
+            if ($request->filled('email')) {
+                $data['email'] = trim($request->email);
+            } elseif (empty($user->email)) {
+                $data['email'] = trim($request->nim) . '@intern.bpjs';
+            }
         } else {
-            $data['email'] = $request->email;
-            $data['nim']   = null; // hapus NIM jika diubah ke non-intern
+            $data['email']     = trim($request->email);
+            $data['nim']       = null;
+            $data['mentor_id'] = null;
         }
 
         if ($request->filled('password')) {
@@ -133,6 +160,23 @@ class UserController extends Controller
         $user->update($data);
 
         return redirect()->route('superadmin.users.index')->with('success', 'Data pengguna berhasil diperbarui.');
+    }
+
+    public function updatePassword(Request $request, User $user)
+    {
+        $request->validate([
+            'password' => ['required', 'confirmed', 'min:6'],
+        ], [
+            'password.required'  => 'Kata sandi baru wajib diisi.',
+            'password.min'       => 'Kata sandi minimal harus 6 karakter.',
+            'password.confirmed' => 'Konfirmasi kata sandi tidak cocok. Harap masukkan kata sandi yang sama di kedua kolom.',
+        ]);
+
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        return redirect()->back()->with('success', "Kata sandi untuk {$user->name} berhasil diperbarui.");
     }
 
     public function destroy(User $user)

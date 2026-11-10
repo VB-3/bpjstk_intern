@@ -109,6 +109,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/users', [\App\Http\Controllers\SuperAdmin\UserController::class, 'store'])->name('users.store');
         Route::get('/users/{user}/edit', [\App\Http\Controllers\SuperAdmin\UserController::class, 'edit'])->name('users.edit');
         Route::put('/users/{user}', [\App\Http\Controllers\SuperAdmin\UserController::class, 'update'])->name('users.update');
+        Route::put('/users/{user}/password', [\App\Http\Controllers\SuperAdmin\UserController::class, 'updatePassword'])->name('users.updatePassword');
         Route::delete('/users/{user}', [\App\Http\Controllers\SuperAdmin\UserController::class, 'destroy'])->name('users.destroy');
 
         // Attendance Management

@@ -170,7 +170,7 @@
                 internExtra.classList.remove('hidden');
                 emailInput.removeAttribute('required');
                 nimInput.setAttribute('required', '');
-                mentorInput.setAttribute('required', '');
+                mentorInput.removeAttribute('required');
             } else {
                 emailField.classList.remove('hidden');
                 internExtra.classList.add('hidden');
