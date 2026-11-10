@@ -161,5 +161,41 @@
         </div>
 
         <x-security-guard />
+
+        {{-- 💬 Floating Chat Button --}}
+        <div x-data="{ tooltip: false }" class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
+
+            {{-- Tooltip label --}}
+            <div x-show="tooltip"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 translate-y-1"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 translate-y-1"
+                 class="bg-gray-900 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap pointer-events-none">
+                💬 Tanya Admin
+                <div class="absolute bottom-[-5px] right-5 w-2.5 h-2.5 bg-gray-900 rotate-45"></div>
+            </div>
+
+            {{-- Chat Button --}}
+            <a href="https://sapa-chatbot.streamlit.app/"
+               target="_blank"
+               rel="noopener noreferrer"
+               @mouseenter="tooltip = true"
+               @mouseleave="tooltip = false"
+               class="relative flex items-center justify-center w-14 h-14 rounded-full bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110 active:scale-95 group"
+               aria-label="Chat dengan Admin">
+
+                {{-- Pulse ring --}}
+                <span class="absolute inset-0 rounded-full bg-green-500 opacity-30 animate-ping"></span>
+
+                {{-- Chat icon --}}
+                <svg class="w-7 h-7 text-white relative z-10" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20 2H4C2.9 2 2 2.9 2 4v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+                </svg>
+            </a>
+        </div>
+
     </body>
 </html>
