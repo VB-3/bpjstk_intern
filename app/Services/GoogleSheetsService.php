@@ -21,7 +21,6 @@ class GoogleSheetsService
      * Pengecekan dilakukan secara case-insensitive.
      */
     protected array $excludedFromLeaderboard = [
-        'nabilah putri ariza',
         'samuel gautama manik',
         'zahra naziha parinduri',
         'elvan yohanes gultom',
