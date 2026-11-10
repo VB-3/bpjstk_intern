@@ -16,6 +16,36 @@ class GoogleSheetsService
     protected $service;
     protected $spreadsheetId;
 
+    /**
+     * Daftar nama peserta magang yang dikecualikan dari leaderboard BPU.
+     * Pengecekan dilakukan secara case-insensitive.
+     */
+    protected array $excludedFromLeaderboard = [
+        'nabilah putri ariza',
+        'samuel gautama manik',
+        'zahra naziha parinduri',
+        'elvan yohanes gultom',
+        'rima nazwa',
+        'euprasia enjelika situmorang',
+        'aurora hannah ariana hutapea',
+        'grace sartika padang',
+        'jeremia hasudungan sitinjak',
+    ];
+
+    /**
+     * Cek apakah nama tertentu dikecualikan dari leaderboard.
+     */
+    protected function isExcludedFromLeaderboard(string $name): bool
+    {
+        $nameLower = mb_strtolower(trim($name));
+        foreach ($this->excludedFromLeaderboard as $excluded) {
+            if (mb_strtolower($excluded) === $nameLower) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function __construct()
     {
         $this->spreadsheetId = env('GOOGLE_SPREADSHEET_ID', '1Jo2qkM90WfM6DoIdLeDAcVEANO89TW3Nkr9lvbK8uBw');
@@ -82,6 +112,9 @@ class GoogleSheetsService
                 if (stripos($name, 'total') !== false || stripos($nim, 'total') !== false) continue;
                 if (!is_numeric($grandTotal)) continue;
 
+                // Abaikan peserta yang dikecualikan dari leaderboard
+                if ($this->isExcludedFromLeaderboard($name)) continue;
+
                 $results->push((object)[
                     'nim'         => $nim,
                     'name'        => $name ?: ($nim ?: 'Peserta Magang'),
@@ -109,6 +142,7 @@ class GoogleSheetsService
             ->withSum('todos', 'bpu_achievement')
             ->orderByDesc('todos_sum_bpu_achievement')
             ->get()
+            ->filter(fn($user) => !$this->isExcludedFromLeaderboard($user->name))
             ->map(function ($user) {
                 return (object)[
                     'nim'         => $user->nim,
