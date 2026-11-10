@@ -32,7 +32,7 @@
                         {{-- webcam --}}
                         <div class="mb-5">
                             <div class="w-full rounded-2xl overflow-hidden border-2 border-gray-100 bg-gray-900 shadow-inner aspect-video">
-                                <video id="webcam" autoplay playsinline class="w-full h-full object-cover"></video>
+                                <video id="webcam" autoplay playsinline class="w-full h-full object-cover" style="transform: scaleX(-1);"></video>
                             </div>
                             <canvas id="canvas" class="hidden"></canvas>
                         </div>
@@ -194,6 +194,11 @@
             const ctx = canvas.getContext('2d');
             canvas.width  = video.videoWidth;
             canvas.height = video.videoHeight;
+
+            // Balik canvas secara horizontal agar foto tersimpan tidak mirror
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
+
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             document.getElementById(photoInputId).value = canvas.toDataURL('image/jpeg');
             document.getElementById(formId).submit();
