@@ -133,7 +133,7 @@
                                     <textarea id="summary" name="summary" rows="5" required
                                         placeholder="Tuliskan poin-poin kegiatan hari ini..."
                                         x-model="summary"
-                                        :disabled="noTask"
+                                        :readonly="noTask"
                                         :style="noTask ? 'background:#fff7ed;border-color:#fdba74;color:#c2410c;cursor:not-allowed;opacity:0.85;' : ''"
                                         style="background:#f9fafb;border-color:#e5e7eb;"
                                         class="w-full border rounded-xl px-4 py-3 text-sm font-medium transition-all outline-none resize-none"></textarea>
