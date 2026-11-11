@@ -70,14 +70,52 @@
 
                         @elseif(!$todayTodo)
                             <form method="POST" action="{{ route('todos.store') }}" class="space-y-5"
-                                  x-data="{ loading: false }" @submit="loading = true">
+                                  x-data="{
+                                      loading: false,
+                                      noTask: false,
+                                      summary: '',
+                                      toggleNoTask() {
+                                          this.noTask = !this.noTask;
+                                          if (this.noTask) {
+                                              this.summary = 'Tidak ada laporan dari mentor';
+                                          } else {
+                                              this.summary = '';
+                                          }
+                                      }
+                                  }" @submit="loading = true">
                                 @csrf
+
+                                {{-- Toggle: Tidak ada laporan dari mentor --}}
+                                <div class="flex items-center justify-between p-3.5 rounded-xl border transition-all"
+                                     :class="noTask ? 'bg-orange-50 border-orange-200' : 'bg-gray-50 border-gray-200'">
+                                    <div class="flex flex-col">
+                                        <span class="text-xs font-bold text-gray-700 leading-tight">Tidak ada laporan dari mentor</span>
+                                        <span class="text-[11px] text-gray-400 mt-0.5">Aktifkan jika hari ini tidak ada tugas</span>
+                                    </div>
+                                    {{-- Switch Button --}}
+                                    <button type="button" @click="toggleNoTask()"
+                                        class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-1"
+                                        :class="noTask ? 'bg-orange-500' : 'bg-gray-300'"
+                                        role="switch" :aria-checked="noTask.toString()">
+                                        <span class="sr-only">Tidak ada laporan dari mentor</span>
+                                        <span class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                                              :class="noTask ? 'translate-x-5' : 'translate-x-0'"></span>
+                                    </button>
+                                </div>
+
                                 <div>
                                     <label for="summary" class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Deskripsi Kegiatan</label>
                                     <textarea id="summary" name="summary" rows="5" required
                                         placeholder="Tuliskan poin-poin kegiatan hari ini..."
-                                        class="w-full border border-gray-200 bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 rounded-xl px-4 py-3 text-sm font-medium transition-all outline-none resize-none"></textarea>
-                                    <p class="mt-1.5 text-xs text-gray-400">Dokumentasi foto unggah ke Google Drive Anda.</p>
+                                        x-model="summary"
+                                        :disabled="noTask"
+                                        :class="noTask ? 'bg-orange-50 border-orange-200 text-orange-700 cursor-not-allowed opacity-80' : 'bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 border-gray-200'"
+                                        class="w-full border rounded-xl px-4 py-3 text-sm font-medium transition-all outline-none resize-none"></textarea>
+                                    <p class="mt-1.5 text-xs text-gray-400" x-show="!noTask">Dokumentasi foto unggah ke Google Drive Anda.</p>
+                                    <p class="mt-1.5 text-xs text-orange-500 font-medium flex items-center gap-1" x-show="noTask">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        Kolom dikunci karena tidak ada laporan dari mentor.
+                                    </p>
                                 </div>
                                 @if(auth()->user()->isSuperAdmin())
                                 <div>
