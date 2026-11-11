@@ -86,21 +86,46 @@
                                 @csrf
 
                                 {{-- Toggle: Tidak ada laporan dari mentor --}}
-                                <div class="flex items-center justify-between p-3.5 rounded-xl border transition-all"
-                                     :style="noTask ? 'background:#fff7ed;border-color:#fdba74;' : 'background:#f9fafb;border-color:#e5e7eb;'">
-                                    <div class="flex flex-col">
-                                        <span class="text-xs font-bold leading-tight" style="color:#374151;">Tidak ada laporan dari mentor</span>
-                                        <span class="text-xs mt-0.5" style="color:#9ca3af;">Aktifkan jika hari ini tidak ada tugas</span>
+                                <style>
+                                    .no-mentor-cb { position:absolute;opacity:0;width:0;height:0; }
+                                    .no-mentor-track {
+                                        position:relative;display:inline-flex;align-items:center;
+                                        width:44px;height:24px;border-radius:9999px;
+                                        background:#d1d5db;cursor:pointer;
+                                        transition:background 0.25s;flex-shrink:0;
+                                    }
+                                    .no-mentor-cb:checked ~ .no-mentor-track { background:#f97316; }
+                                    .no-mentor-thumb {
+                                        position:absolute;left:2px;
+                                        width:20px;height:20px;border-radius:9999px;
+                                        background:white;
+                                        box-shadow:0 1px 4px rgba(0,0,0,0.25);
+                                        transition:transform 0.25s;
+                                        pointer-events:none;
+                                    }
+                                    .no-mentor-cb:checked ~ .no-mentor-track .no-mentor-thumb { transform:translateX(20px); }
+                                    .no-mentor-wrap {
+                                        display:flex;align-items:center;justify-content:space-between;
+                                        padding:12px 14px;border-radius:12px;border:1px solid #e5e7eb;
+                                        background:#f9fafb;transition:background 0.25s,border-color 0.25s;
+                                    }
+                                    .no-mentor-cb:checked ~ * .no-mentor-wrap,
+                                    .no-mentor-wrap.active { background:#fff7ed;border-color:#fdba74; }
+                                </style>
+
+                                <div class="no-mentor-wrap" id="noMentorWrap">
+                                    <div style="display:flex;flex-direction:column;">
+                                        <span style="font-size:12px;font-weight:700;color:#374151;line-height:1.3;">Tidak ada laporan dari mentor</span>
+                                        <span style="font-size:11px;color:#9ca3af;margin-top:2px;">Aktifkan jika hari ini tidak ada tugas</span>
                                     </div>
-                                    {{-- Switch Button --}}
-                                    <button type="button" @click="toggleNoTask()"
-                                        :style="noTask ? 'background:#f97316;' : 'background:#d1d5db;'"
-                                        style="position:relative;display:inline-flex;align-items:center;width:44px;height:24px;border-radius:9999px;border:none;cursor:pointer;transition:background 0.2s;flex-shrink:0;outline:none;"
-                                        role="switch" :aria-checked="noTask.toString()">
-                                        <span class="sr-only">Tidak ada laporan dari mentor</span>
-                                        <span :style="noTask ? 'transform:translateX(20px);' : 'transform:translateX(2px);'"
-                                              style="display:inline-block;width:20px;height:20px;border-radius:9999px;background:white;box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:transform 0.2s;"></span>
-                                    </button>
+                                    <label style="position:relative;display:inline-flex;align-items:center;cursor:pointer;flex-shrink:0;">
+                                        <input type="checkbox" class="no-mentor-cb"
+                                               x-model="noTask"
+                                               @change="noTask ? summary = 'Tidak ada laporan dari mentor' : summary = ''; document.getElementById('noMentorWrap').classList.toggle('active', noTask);">
+                                        <span class="no-mentor-track">
+                                            <span class="no-mentor-thumb"></span>
+                                        </span>
+                                    </label>
                                 </div>
 
                                 <div>
@@ -109,11 +134,12 @@
                                         placeholder="Tuliskan poin-poin kegiatan hari ini..."
                                         x-model="summary"
                                         :disabled="noTask"
-                                        :style="noTask ? 'background:#fff7ed;border-color:#fdba74;color:#c2410c;cursor:not-allowed;opacity:0.85;' : 'background:#f9fafb;border-color:#e5e7eb;'"
+                                        :style="noTask ? 'background:#fff7ed;border-color:#fdba74;color:#c2410c;cursor:not-allowed;opacity:0.85;' : ''"
+                                        style="background:#f9fafb;border-color:#e5e7eb;"
                                         class="w-full border rounded-xl px-4 py-3 text-sm font-medium transition-all outline-none resize-none"></textarea>
                                     <p class="mt-1.5 text-xs text-gray-400" x-show="!noTask">Dokumentasi foto unggah ke Google Drive Anda.</p>
-                                    <p class="mt-1.5 text-xs font-medium flex items-center gap-1" style="color:#ea580c;" x-show="noTask">
-                                        <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <p class="mt-1.5 text-xs font-medium flex items-center gap-1" style="color:#ea580c;display:none;" x-show="noTask" x-cloak>
+                                        <svg style="width:14px;height:14px;flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                         Kolom dikunci karena tidak ada laporan dari mentor.
                                     </p>
                                 </div>
