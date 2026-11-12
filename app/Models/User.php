@@ -91,6 +91,11 @@ class User extends Authenticatable
         return $this->hasMany(User::class, 'mentor_id');
     }
 
+    public function assignedTasks()
+    {
+        return $this->hasMany(AssignedTask::class, 'created_by');
+    }
+
     public function getFormattedGdriveLinkAttribute()
     {
         if (!$this->gdrive_link) {
