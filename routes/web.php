@@ -71,6 +71,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/tasks', [\App\Http\Controllers\MentorTaskController::class, 'index'])->name('tasks.index');
         Route::post('/tasks', [\App\Http\Controllers\MentorTaskController::class, 'store'])->name('tasks.store');
         Route::get('/students', [\App\Http\Controllers\MentorStudentController::class, 'index'])->name('students.index');
+        Route::get('/performance', [\App\Http\Controllers\MentorPerformanceController::class, 'index'])->name('performance.index');
     });
 
 
