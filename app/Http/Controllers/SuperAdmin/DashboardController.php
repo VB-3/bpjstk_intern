@@ -62,6 +62,9 @@ class DashboardController extends Controller
             ->take(6)
             ->get();
 
+        // Data Capaian Performa Mentor (ARK) Realtime dari Google Spreadsheet
+        $mentorPerformance = $sheetsService->getMentorPerformance();
+
         return view('superadmin.dashboard', compact(
             'totalUsers',
             'totalInterns',
@@ -78,7 +81,8 @@ class DashboardController extends Controller
             'bpuLeaderboard',
             'bpuTop3',
             'activeTasks',
-            'completedTasks'
+            'completedTasks',
+            'mentorPerformance'
         ));
     }
 }

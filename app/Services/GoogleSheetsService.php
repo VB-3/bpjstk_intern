@@ -15,10 +15,12 @@ class GoogleSheetsService
     protected $client;
     protected $service;
     protected $spreadsheetId;
+    protected $mentorSpreadsheetId;
 
     public function __construct()
     {
         $this->spreadsheetId = env('GOOGLE_SPREADSHEET_ID', '1Jo2qkM90WfM6DoIdLeDAcVEANO89TW3Nkr9lvbK8uBw');
+        $this->mentorSpreadsheetId = env('MENTOR_SPREADSHEET_ID', '1TyRm64Onlmpyfqzw3MyICPGpttH-3_rTYOZHFS94iWY');
         
         $this->client = new Google_Client();
         $this->client->setApplicationName('Portal Magang BPJSTK');
@@ -44,6 +46,125 @@ class GoogleSheetsService
             return $this->fetchLeaderboardFromSheet();
         });
     }
+
+    /**
+     * Mengambil data capaian kinerja mentor (ARK) realtime dari Google Spreadsheet
+     * Di-cache selama 30 detik
+     */
+    public function getMentorPerformance()
+    {
+        return Cache::remember('google_sheets_mentor_performance', 30, function () {
+            return $this->fetchMentorPerformanceFromSheet();
+        });
+    }
+
+    protected function fetchMentorPerformanceFromSheet()
+    {
+        try {
+            $url = "https://docs.google.com/spreadsheets/d/{$this->mentorSpreadsheetId}/gviz/tq?tqx=out:csv";
+            $response = Http::timeout(8)->get($url);
+
+            if (!$response->successful()) {
+                Log::warning('Failed fetching mentor performance from Google Sheet: HTTP ' . $response->status());
+                return $this->fallbackMentorPerformance();
+            }
+
+            $csv = $response->body();
+            $lines = explode("\n", trim($csv));
+
+            $categories = [
+                'tk_pu_aktif' => [
+                    'title'   => 'TK PU AKTIF',
+                    'unit'    => 'Tenaga Kerja',
+                    'mentors' => collect(),
+                    'total'   => null,
+                ],
+                'bpu_aktif' => [
+                    'title'   => 'TK BPU AKTIF',
+                    'unit'    => 'Tenaga Kerja',
+                    'mentors' => collect(),
+                    'total'   => null,
+                ],
+                'iuran' => [
+                    'title'   => 'IURAN',
+                    'unit'    => 'Rupiah (Rp)',
+                    'mentors' => collect(),
+                    'total'   => null,
+                ],
+            ];
+
+            $categoryKeys = ['tk_pu_aktif', 'bpu_aktif', 'iuran'];
+            $currentCatIndex = 0;
+            $headerDate = 'Terbaru';
+
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if (empty($line)) continue;
+
+                $row = str_getcsv($line);
+                $firstCol = trim($row[0] ?? '');
+                $nameCol  = trim($row[1] ?? '');
+                $target   = trim($row[2] ?? '');
+                $realisasi= trim($row[3] ?? '');
+                $gap      = trim($row[4] ?? '');
+                $percent  = trim($row[5] ?? '');
+
+                // Deteksi tanggal laporan di baris 0
+                if (stripos($firstCol, 'Realisasi') !== false) {
+                    $headerDate = trim(preg_replace('/\bNo\b/i', '', $firstCol));
+                    continue;
+                }
+
+                // Deteksi pemisah kategori baru (header baris "Nama ARK")
+                if (stripos($nameCol, 'Nama ARK') !== false) {
+                    $currentCatIndex++;
+                    continue;
+                }
+
+                $activeCatKey = $categoryKeys[$currentCatIndex] ?? null;
+                if (!$activeCatKey) continue;
+
+                // Baris data mentor (No 1-8)
+                if (is_numeric($firstCol) && !empty($nameCol)) {
+                    $categories[$activeCatKey]['mentors']->push((object)[
+                        'no'        => (int)$firstCol,
+                        'name'      => $nameCol,
+                        'target'    => $target,
+                        'realisasi' => $realisasi,
+                        'gap'       => $gap,
+                        'percent'   => $percent,
+                    ]);
+                }
+                // Baris grand total kategori (kolom no kosong, tapi target/realisasi ada)
+                elseif (empty($firstCol) && empty($nameCol) && !empty($target) && !empty($realisasi)) {
+                    $categories[$activeCatKey]['total'] = (object)[
+                        'target'    => $target,
+                        'realisasi' => $realisasi,
+                        'gap'       => $gap,
+                        'percent'   => $percent,
+                    ];
+                }
+            }
+
+            return (object)[
+                'date'       => $headerDate,
+                'categories' => $categories,
+            ];
+
+        } catch (Exception $e) {
+            Log::error('Exception in fetchMentorPerformanceFromSheet: ' . $e->getMessage());
+            return $this->fallbackMentorPerformance();
+        }
+    }
+
+    protected function fallbackMentorPerformance()
+    {
+        return (object)[
+            'date'       => 'Offline / Data Lokal',
+            'categories' => [],
+        ];
+    }
+
 
     protected function fetchLeaderboardFromSheet()
     {

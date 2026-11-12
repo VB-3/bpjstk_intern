@@ -267,6 +267,159 @@
 
 
 
+        {{-- ── Pemantauan Kinerja Mentor (ARK) Real Time Spreadsheet ─────── --}}
+        @if(isset($mentorPerformance) && !empty($mentorPerformance->categories))
+        <div class="glass-effect rounded-3xl overflow-hidden shadow-lg border border-white/50" x-data="{ activeTab: 'tk_pu_aktif' }">
+            <div class="bg-gradient-to-r from-emerald-800 to-green-700 p-6 sm:px-8 text-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-2xl shrink-0 shadow-inner">
+                        📊
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-xl font-extrabold tracking-tight">Monitoring Realisasi & Capaian Mentor (ARK)</h3>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white/20 text-yellow-300 border border-yellow-300/30">
+                                <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+                                Real Time Google Sheets
+                            </span>
+                        </div>
+                        <p class="text-xs text-green-100/90 mt-1">
+                            Laporan berkala: <span class="font-bold text-yellow-200">{{ $mentorPerformance->date }}</span> — Target, Realisasi, GAP, dan Persentase Capaian per Mentor.
+                        </p>
+                    </div>
+                </div>
+
+                {{-- Tab Buttons --}}
+                <div class="flex items-center gap-1.5 p-1.5 bg-black/20 rounded-2xl border border-white/10 self-stretch md:self-auto overflow-x-auto">
+                    @foreach($mentorPerformance->categories as $catKey => $cat)
+                        <button type="button"
+                                @click="activeTab = '{{ $catKey }}'"
+                                :class="activeTab === '{{ $catKey }}' ? 'bg-white text-emerald-900 shadow-md font-extrabold' : 'text-green-100 hover:text-white hover:bg-white/10 font-semibold'"
+                                class="px-4 py-2 rounded-xl text-xs whitespace-nowrap transition-all duration-200">
+                            {{ $cat['title'] }}
+                        </button>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- Tab Contents --}}
+            <div class="p-6 sm:p-8 bg-white/70">
+                @foreach($mentorPerformance->categories as $catKey => $cat)
+                    <div x-show="activeTab === '{{ $catKey }}'" style="display: none;" class="space-y-6">
+                        {{-- Summary Cards Bar --}}
+                        @if($cat['total'])
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div class="p-4 rounded-2xl bg-gray-50 border border-gray-100">
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Target</p>
+                                    <p class="text-xl sm:text-2xl font-extrabold text-gray-800 mt-1">{{ $cat['total']->target }}</p>
+                                    <p class="text-[11px] text-gray-400 mt-0.5">{{ $cat['unit'] }}</p>
+                                </div>
+                                <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-100">
+                                    <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Total Realisasi</p>
+                                    <p class="text-xl sm:text-2xl font-extrabold text-emerald-700 mt-1">{{ $cat['total']->realisasi }}</p>
+                                    <p class="text-[11px] text-emerald-600/70 mt-0.5">{{ $cat['unit'] }}</p>
+                                </div>
+                                <div class="p-4 rounded-2xl bg-amber-50 border border-amber-100">
+                                    <p class="text-[10px] font-bold text-amber-600 uppercase tracking-widest">GAP Total</p>
+                                    <p class="text-xl sm:text-2xl font-extrabold text-amber-700 mt-1">{{ $cat['total']->gap }}</p>
+                                    <p class="text-[11px] text-amber-600/70 mt-0.5">Selisih Target</p>
+                                </div>
+                                <div class="p-4 rounded-2xl bg-blue-50 border border-blue-100">
+                                    <p class="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Persentase Capaian</p>
+                                    <p class="text-xl sm:text-2xl font-extrabold text-blue-700 mt-1">{{ $cat['total']->percent }}</p>
+                                    <p class="text-[11px] text-blue-600/70 mt-0.5">Rata-rata Akumulasi</p>
+                                </div>
+                            </div>
+                        @endif
+
+                        {{-- Table --}}
+                        <div class="overflow-x-auto rounded-2xl border border-gray-100 shadow-sm bg-white">
+                            <table class="w-full min-w-[700px] text-left text-sm">
+                                <thead class="bg-gray-50/80 text-gray-500 font-bold border-b border-gray-100">
+                                    <tr>
+                                        <th class="px-6 py-3.5 text-center w-14 text-xs uppercase tracking-wider">No</th>
+                                        <th class="px-6 py-3.5 text-xs uppercase tracking-wider">Nama Mentor (ARK)</th>
+                                        <th class="px-6 py-3.5 text-right text-xs uppercase tracking-wider">Target</th>
+                                        <th class="px-6 py-3.5 text-right text-xs uppercase tracking-wider">Realisasi</th>
+                                        <th class="px-6 py-3.5 text-right text-xs uppercase tracking-wider">GAP</th>
+                                        <th class="px-6 py-3.5 text-center text-xs uppercase tracking-wider">% Capaian</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 bg-white">
+                                    @forelse($cat['mentors'] as $mentor)
+                                        @php
+                                            $percentNum = (float) rtrim(str_replace(['%', ','], '', $mentor->percent), ' ');
+                                            $badgeColor = $percentNum >= 95 ? 'bg-emerald-100 text-emerald-800' : ($percentNum >= 80 ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800');
+                                        @endphp
+                                        <tr class="hover:bg-emerald-50/30 transition-colors">
+                                            <td class="px-6 py-4 text-center font-bold text-gray-400 text-xs">
+                                                {{ $mentor->no }}
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 text-white flex items-center justify-center font-extrabold text-xs shadow-sm">
+                                                        {{ strtoupper(substr($mentor->name, 0, 1)) }}
+                                                    </div>
+                                                    <div>
+                                                        <p class="font-bold text-gray-900">{{ $mentor->name }}</p>
+                                                        <span class="inline-block text-[10px] text-gray-400 font-medium">Pembimbing / ARK</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 text-right font-semibold text-gray-600">
+                                                {{ $mentor->target }}
+                                            </td>
+                                            <td class="px-6 py-4 text-right font-extrabold text-emerald-700">
+                                                {{ $mentor->realisasi }}
+                                            </td>
+                                            <td class="px-6 py-4 text-right font-semibold {{ str_contains($mentor->gap, '-') || str_contains($mentor->gap, '(') ? 'text-rose-600' : 'text-emerald-600' }}">
+                                                {{ $mentor->gap }}
+                                            </td>
+                                            <td class="px-6 py-4 text-center">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-black {{ $badgeColor }}">
+                                                    {{ $mentor->percent }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="6" class="px-6 py-8 text-center text-gray-400">
+                                                Tidak ada data mentor untuk kategori ini.
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                                @if($cat['total'])
+                                    <tfoot class="bg-emerald-50/50 font-extrabold border-t-2 border-emerald-200/60 text-gray-800">
+                                        <tr>
+                                            <td colspan="2" class="px-6 py-4 uppercase text-xs tracking-wider text-emerald-900">
+                                                Total Keseluruhan {{ $cat['title'] }}
+                                            </td>
+                                            <td class="px-6 py-4 text-right text-gray-700">
+                                                {{ $cat['total']->target }}
+                                            </td>
+                                            <td class="px-6 py-4 text-right text-emerald-800">
+                                                {{ $cat['total']->realisasi }}
+                                            </td>
+                                            <td class="px-6 py-4 text-right {{ str_contains($cat['total']->gap, '-') || str_contains($cat['total']->gap, '(') ? 'text-rose-700' : 'text-emerald-700' }}">
+                                                {{ $cat['total']->gap }}
+                                            </td>
+                                            <td class="px-6 py-4 text-center">
+                                                <span class="inline-flex items-center px-3.5 py-1 rounded-full text-xs font-black bg-emerald-600 text-white shadow-sm">
+                                                    {{ $cat['total']->percent }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                @endif
+                            </table>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
         {{-- ── Riwayat Tugas: Tugas Aktif vs Tugas Selesai ──────────────── --}}
         <div>
             <div class="flex items-center justify-between mb-3">
