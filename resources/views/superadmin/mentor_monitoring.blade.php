@@ -176,7 +176,7 @@
                                                     </div>
                                                     <div>
                                                         <p class="font-bold text-gray-900">{{ $mentor->name }}</p>
-                                                        <p class="text-xs text-gray-400">Pembimbing Magang</p>
+                                                        <p class="text-xs text-gray-400">Account Representative Khusus</p>
                                                     </div>
                                                 </div>
                                             </td>
@@ -265,6 +265,7 @@
                                         </div>
                                         <div>
                                             <p class="font-bold text-gray-900">{{ $m->name }}</p>
+                                            <p class="text-xs text-gray-400">Account Representative Khusus</p>
                                         </div>
                                     </div>
                                 </td>
