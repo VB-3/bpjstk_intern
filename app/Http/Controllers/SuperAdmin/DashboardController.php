@@ -14,6 +14,24 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        $sheetsService = app(\App\Services\GoogleSheetsService::class);
+        $mentorPerformance = $sheetsService->getMentorPerformance();
+
+        // Jika akun yang login adalah superadmin khusus monitoring mentor (medankota@superadmin.com)
+        if (auth()->user()->email === 'medankota@superadmin.com' || request('view') === 'mentor') {
+            $totalMentors = User::where('role', 'mentor')->count();
+            $mentorsList = User::where('role', 'mentor')
+                ->withCount('mentees', 'assignedTasks')
+                ->orderBy('name')
+                ->get();
+
+            return view('superadmin.mentor_monitoring', compact(
+                'totalMentors',
+                'mentorPerformance',
+                'mentorsList'
+            ));
+        }
+
         $totalUsers = User::count();
         $totalInterns = User::where('role', 'intern')->count();
         $totalMentors = User::where('role', 'mentor')->count();
