@@ -115,12 +115,12 @@
                     @endif
 
                     <span class="text-green-200/80">
-                        @if($isFallbackDate && $snapshot)
-                            <span class="text-yellow-300/90 font-medium">Fallback: snapshot {{ $snapshot->snapshot_date->translatedFormat('d M Y') }}</span>
-                        @elseif($snapshot)
+                        @if($snapshot)
                             Disimpan {{ $snapshot->updated_at->format('H:i') }} WIB &mdash; {{ $snapshot->header_date ?? '-' }}
+                        @elseif($selectedDate === $today)
+                            Data live spreadsheet (hari ini)
                         @else
-                            Data live spreadsheet (belum ada snapshot)
+                            <span class="text-yellow-300 font-semibold">⚠️ Tidak ada rekaman arsip pada tanggal ini</span>
                         @endif
                     </span>
                 </div>
@@ -344,17 +344,54 @@
             </div>
 
         @else
-            {{-- Empty State --}}
-            <div class="glass-effect rounded-2xl py-20 text-center shadow">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gray-100 text-3xl mb-4">📅</div>
-                <p class="font-bold text-gray-800 text-base">Belum Ada Catatan Histori</p>
-                <p class="text-gray-500 text-sm mt-1 max-w-sm mx-auto">
-                    Data histori akan tersimpan otomatis setiap 24 jam saat spreadsheet terhubung.
+            {{-- Empty State Jika Tanggal yang Dipilih Belum Ada Snapshot --}}
+            <div class="glass-effect rounded-2xl p-8 sm:p-12 text-center shadow border border-gray-100 max-w-2xl mx-auto">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-50 text-amber-600 border border-amber-200 text-3xl mb-4 shadow-sm">
+                    📅
+                </div>
+                <h4 class="font-extrabold text-gray-900 text-lg sm:text-xl">
+                    Tidak Ada Rekaman Snapshot pada {{ \Carbon\Carbon::parse($selectedDate)->translatedFormat('d F Y') }}
+                </h4>
+                <p class="text-gray-500 text-xs sm:text-sm mt-1.5 max-w-md mx-auto leading-relaxed">
+                    Sistem mulai aktif mencatat arsip rekapitulasi saat monitoring pertama kali dijalankan. Data pada tanggal ini belum pernah terekam di sistem.
                 </p>
-                <a href="{{ route('superadmin.dashboard') }}"
-                   class="mt-5 inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-xl shadow-sm transition-colors">
-                    Buka Monitoring Live
-                </a>
+
+                @if($snapshotsList->isNotEmpty())
+                    <div class="mt-6 pt-6 border-t border-gray-100">
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
+                            Pilih Tanggal Arsip yang Tersedia:
+                        </p>
+                        <div class="flex flex-wrap items-center justify-center gap-2">
+                            @foreach($snapshotsList as $snap)
+                                <a href="{{ route('superadmin.mentor-history.index', ['date' => $snap->snapshot_date->toDateString()]) }}"
+                                   class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all
+                                          {{ $snap->snapshot_date->toDateString() === now()->toDateString()
+                                              ? 'bg-green-700 hover:bg-green-800 text-white shadow-sm'
+                                              : 'bg-white hover:bg-gray-50 text-gray-800 border border-gray-200 shadow-sm' }}">
+                                    <span>📅</span>
+                                    <span>{{ $snap->snapshot_date->translatedFormat('d M Y') }}</span>
+                                    @if($snap->snapshot_date->toDateString() === now()->toDateString())
+                                        <span class="px-1.5 py-0.2 rounded text-[10px] bg-white/20 text-white">Hari Ini</span>
+                                    @endif
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
+                    <a href="{{ route('superadmin.mentor-history.index', ['date' => now()->toDateString()]) }}"
+                       class="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 active:scale-95 text-white text-xs sm:text-sm font-bold rounded-xl shadow transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>Lihat Data Hari Ini (Terbaru)</span>
+                    </a>
+                    <a href="{{ route('superadmin.dashboard') }}"
+                       class="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs sm:text-sm font-semibold rounded-xl transition-colors">
+                        <span>Monitoring Live</span>
+                    </a>
+                </div>
             </div>
         @endif
 

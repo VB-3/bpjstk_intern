@@ -19,14 +19,17 @@ class MentorHistoryController extends Controller
             abort(403, 'Akses khusus untuk superadmin medankota.');
         }
 
-        $selectedDate = $request->input('date', now()->toDateString());
+        $today = now()->toDateString();
+        $selectedDate = $request->input('date', $today);
         $dbMigrated = Schema::hasTable('mentor_performance_snapshots');
         $snapshot = null;
         $previousSnapshot = null;
         $isFallbackDate = false;
         $snapshotsList = collect();
+        $changes = [];
+        $mutationLogs = [];
 
-        // Ambil data live dari spreadsheet sebagai fallback atau untuk auto-snapshot
+        // 1. Ambil data live dari spreadsheet
         $currentPerformance = null;
         try {
             $currentPerformance = $sheetsService->getMentorPerformance();
@@ -34,8 +37,9 @@ class MentorHistoryController extends Controller
             Log::warning('Gagal mengambil data live spreadsheet: ' . $e->getMessage());
         }
 
+        // 2. Jika database tabel snapshot sudah tersedia
         if ($dbMigrated) {
-            // Auto-record snapshot hari ini dari Google Spreadsheet
+            // Auto-record / update snapshot hari ini dari Google Spreadsheet
             if ($currentPerformance && !empty($currentPerformance->categories)) {
                 try {
                     MentorPerformanceSnapshot::recordCurrentSnapshot($currentPerformance);
@@ -45,55 +49,53 @@ class MentorHistoryController extends Controller
             }
 
             try {
-                // Cari snapshot untuk tanggal yang dipilih
+                // Cari snapshot persis untuk tanggal yang dipilih user
                 $snapshot = MentorPerformanceSnapshot::where('snapshot_date', $selectedDate)->first();
 
-                // Jika tidak ada data persis pada tanggal tersebut, cari data terakhir per 24 jam sebelumnya
-                if (!$snapshot) {
-                    $snapshot = MentorPerformanceSnapshot::where('snapshot_date', '<=', $selectedDate)
-                        ->orderByDesc('snapshot_date')
-                        ->first();
+                // Ambil daftar seluruh snapshot yang ada untuk navigasi kalender
+                $snapshotsList = MentorPerformanceSnapshot::orderByDesc('snapshot_date')->get();
 
-                    if ($snapshot) {
-                        $isFallbackDate = true;
-                    } else {
-                        // Fallback terakhir: ambil snapshot terbaru yang ada
-                        $snapshot = MentorPerformanceSnapshot::orderByDesc('snapshot_date')->first();
-                    }
-                }
-
-                // Ambil snapshot pembanding sebelumnya (untuk cek riwayat perubahan)
+                // Jika snapshot ada, cari snapshot pembanding tepat sebelum tanggal tersebut
                 if ($snapshot) {
                     $previousSnapshot = MentorPerformanceSnapshot::where('snapshot_date', '<', $snapshot->snapshot_date)
                         ->orderByDesc('snapshot_date')
                         ->first();
-                }
 
-                // Daftar semua tanggal yang memiliki snapshot (untuk navigasi / kalender)
-                $snapshotsList = MentorPerformanceSnapshot::orderByDesc('snapshot_date')->get();
+                    // Ambil log mutasi internal yang tersimpan
+                    $mutationLogs = $snapshot->getMutationLogs();
+
+                    // Hitung perbedaan antara snapshot yang dipilih dengan snapshot sebelumnya
+                    if ($previousSnapshot) {
+                        $currCats = is_array($snapshot->categories) ? $snapshot->categories : json_decode($snapshot->categories, true);
+                        $prevCats = is_array($previousSnapshot->categories) ? $previousSnapshot->categories : json_decode($previousSnapshot->categories, true);
+
+                        $changes = MentorPerformanceSnapshot::detectCategoryDifferences($prevCats ?? [], $currCats ?? []);
+                    }
+                }
             } catch (\Exception $e) {
                 Log::error('Error querying MentorPerformanceSnapshot: ' . $e->getMessage());
             }
         }
 
-        // Format data categories agar siap ditampilkan di view
+        // 3. Format data categories agar siap ditampilkan di view
         if ($snapshot) {
             $formattedCategories = $snapshot->getFormattedCategories();
             $mentorPerformance = (object) [
                 'date'       => $snapshot->header_date ?? $snapshot->snapshot_date->translatedFormat('d F Y'),
                 'categories' => $formattedCategories,
             ];
-        } elseif ($currentPerformance && !empty($currentPerformance->categories)) {
-            // Fallback jika belum ada snapshot di database: gunakan data live dari spreadsheet
+        } elseif ($selectedDate === $today && $currentPerformance && !empty($currentPerformance->categories)) {
+            // Jika memilih hari ini dan belum ada snapshot DB: tampilkan data live
             $mentorPerformance = $currentPerformance;
         } else {
+            // Tanggal di masa lalu yang memang belum memiliki snapshot
             $mentorPerformance = (object) [
-                'date'       => 'Tidak Ada Data',
+                'date'       => 'Tidak Ada Rekaman Data',
                 'categories' => [],
             ];
         }
 
-        // Daftar akun mentor untuk informasi
+        // 4. Daftar akun mentor untuk informasi ringkasan
         $mentorsList = User::where('role', 'mentor')
             ->withCount('mentees', 'assignedTasks')
             ->orderBy('name')
@@ -102,6 +104,7 @@ class MentorHistoryController extends Controller
 
         return view('superadmin.mentor_history', compact(
             'selectedDate',
+            'today',
             'snapshot',
             'previousSnapshot',
             'isFallbackDate',
@@ -109,7 +112,9 @@ class MentorHistoryController extends Controller
             'mentorPerformance',
             'mentorsList',
             'totalMentors',
-            'dbMigrated'
+            'dbMigrated',
+            'changes',
+            'mutationLogs'
         ));
     }
 }
