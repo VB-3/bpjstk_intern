@@ -143,6 +143,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Galeri Foto Absensi (khusus superadmin dengan akses foto)
         Route::get('/attendance-gallery', [\App\Http\Controllers\SuperAdmin\AttendanceGalleryController::class, 'index'])->name('attendance-gallery.index');
+
+        // Histori Monitoring Kinerja Mentor (khusus superadmin medankota)
+        Route::get('/mentor-history', [\App\Http\Controllers\SuperAdmin\MentorHistoryController::class, 'index'])->name('mentor-history.index');
     });
 });
 
