@@ -6,7 +6,7 @@
         </h2>
     </x-slot>
 
-    <div class="page-wrapper" x-data="webcamApp()">
+    <div class="page-wrapper" x-data="{ showPhotoModal: false, activePhotoUrl: '', activePhotoTitle: '' }">
 
         {{-- Flash messages --}}
         @if(session('success'))
@@ -246,8 +246,10 @@
                                                         {{ $att->check_in_time ? \Carbon\Carbon::parse($att->check_in_time)->format('H:i') : '--:--' }}
                                                     </span>
                                                     @if($att->check_in_photo)
-                                                        <a href="{{ Storage::url($att->check_in_photo) }}" target="_blank"
-                                                           class="text-[11px] text-blue-600 hover:underline font-semibold ml-0.5">Foto</a>
+                                                        <a href="{{ route('attendances.photo', ['attendance' => $att->id, 'type' => 'check_in']) }}"
+                                                           @click.prevent="activePhotoUrl = '{{ route('attendances.photo', ['attendance' => $att->id, 'type' => 'check_in']) }}'; activePhotoTitle = 'Foto Check-In ({{ $isHarian ? 'Harian' : 'Luar Harian' }})'; showPhotoModal = true"
+                                                           target="_blank"
+                                                           class="text-[11px] text-blue-600 hover:underline font-semibold ml-0.5 cursor-pointer">Foto</a>
                                                     @endif
                                                 </div>
                                                 <span class="text-gray-300">|</span>
@@ -257,8 +259,10 @@
                                                         {{ $att->check_out_time ? \Carbon\Carbon::parse($att->check_out_time)->format('H:i') : '--:--' }}
                                                     </span>
                                                     @if($att->check_out_photo)
-                                                        <a href="{{ Storage::url($att->check_out_photo) }}" target="_blank"
-                                                           class="text-[11px] text-blue-600 hover:underline font-semibold ml-0.5">Foto</a>
+                                                        <a href="{{ route('attendances.photo', ['attendance' => $att->id, 'type' => 'check_out']) }}"
+                                                           @click.prevent="activePhotoUrl = '{{ route('attendances.photo', ['attendance' => $att->id, 'type' => 'check_out']) }}'; activePhotoTitle = 'Foto Check-Out ({{ $isHarian ? 'Harian' : 'Luar Harian' }})'; showPhotoModal = true"
+                                                           target="_blank"
+                                                           class="text-[11px] text-blue-600 hover:underline font-semibold ml-0.5 cursor-pointer">Foto</a>
                                                     @endif
                                                 </div>
                                             </div>
@@ -285,6 +289,43 @@
                 </div>
             </div>
 
+        </div>
+
+        {{-- Modal Preview Foto Absensi --}}
+        <div x-show="showPhotoModal" 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95"
+             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+             style="display: none;"
+             @keydown.escape.window="showPhotoModal = false">
+            
+            <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-gray-100"
+                 @click.away="showPhotoModal = false">
+                <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-green-600 to-emerald-700 text-white">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <h3 class="font-extrabold text-sm" x-text="activePhotoTitle"></h3>
+                    </div>
+                    <button type="button" @click="showPhotoModal = false" class="text-white/80 hover:text-white">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <div class="p-4 bg-gray-900 flex items-center justify-center min-h-[250px] max-h-[65vh] overflow-hidden">
+                    <img :src="activePhotoUrl" alt="Foto Absensi" class="max-h-[60vh] max-w-full rounded-xl object-contain shadow-lg">
+                </div>
+                <div class="px-6 py-3 bg-gray-50 flex items-center justify-between border-t border-gray-100">
+                    <a :href="activePhotoUrl" target="_blank" class="text-xs text-blue-600 hover:underline font-semibold flex items-center gap-1">
+                        Buka Ukuran Asli ↗
+                    </a>
+                    <button type="button" @click="showPhotoModal = false" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-xl text-xs font-bold text-gray-700 transition-colors">
+                        Tutup
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 

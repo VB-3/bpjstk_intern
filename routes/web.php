@@ -80,6 +80,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/attendances', [\App\Http\Controllers\AttendanceController::class, 'index'])->name('attendances.index');
     Route::post('/attendances/checkin', [\App\Http\Controllers\AttendanceController::class, 'checkIn'])->name('attendances.checkin');
     Route::post('/attendances/checkout', [\App\Http\Controllers\AttendanceController::class, 'checkOut'])->name('attendances.checkout');
+    Route::get('/attendances/{attendance}/photo/{type}', [\App\Http\Controllers\AttendanceController::class, 'showPhoto'])->name('attendances.photo');
 
     Route::get('/todos', [\App\Http\Controllers\TodoController::class, 'index'])->name('todos.index');
     Route::post('/todos', [\App\Http\Controllers\TodoController::class, 'store'])->name('todos.store');

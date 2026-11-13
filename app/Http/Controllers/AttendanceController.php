@@ -136,4 +136,39 @@ class AttendanceController extends Controller
 
         return redirect()->back()->with('success', "Check-out {$label} berhasil!");
     }
+
+    public function showPhoto(Attendance $attendance, $type)
+    {
+        // Pastikan hanya pemilik, mentornya, atau super admin yang bisa melihat
+        $user = auth()->user();
+        if ($user->id !== $attendance->user_id && !$user->isMentor() && !$user->isSuperAdmin()) {
+            abort(403, 'Tidak memiliki akses ke foto ini.');
+        }
+
+        $photoPath = $type === 'check_out' ? $attendance->check_out_photo : $attendance->check_in_photo;
+
+        if (!$photoPath) {
+            abort(404, 'Foto tidak tersedia.');
+        }
+
+        // 1. Cek di public/storage/
+        $file = public_path('storage/' . $photoPath);
+        if (file_exists($file)) {
+            return response()->file($file);
+        }
+
+        // 2. Cek di storage/app/public/
+        $file = storage_path('app/public/' . $photoPath);
+        if (file_exists($file)) {
+            return response()->file($file);
+        }
+
+        // 3. Cek di storage/app/
+        $file = storage_path('app/' . $photoPath);
+        if (file_exists($file)) {
+            return response()->file($file);
+        }
+
+        abort(404, 'File foto fisik tidak ditemukan di server.');
+    }
 }
