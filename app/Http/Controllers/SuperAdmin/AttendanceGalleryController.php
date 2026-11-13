@@ -9,18 +9,13 @@ use Illuminate\Http\Request;
 
 class AttendanceGalleryController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            if (!auth()->user()?->canViewAttendancePhoto()) {
-                abort(403, 'Anda tidak memiliki akses ke galeri foto absensi.');
-            }
-            return $next($request);
-        });
-    }
-
     public function index(Request $request)
     {
+        // Proteksi akses — hanya superadmin yang bisa melihat foto
+        if (!auth()->user()?->canViewAttendancePhoto()) {
+            abort(403, 'Anda tidak memiliki akses ke galeri foto absensi.');
+        }
+
         // Ambil semua intern yang punya foto absensi
         $interns = User::where('role', 'intern')
             ->whereHas('attendances', function ($q) {
