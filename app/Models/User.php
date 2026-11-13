@@ -83,9 +83,9 @@ class User extends Authenticatable
             return true;
         }
 
-        // Peserta magang hanya bisa melihat foto miliknya sendiri
+        // Peserta magang sementara tidak bisa melihat foto absensi
         if ($this->isIntern()) {
-            return $attendance ? $attendance->user_id === $this->id : true;
+            return false;
         }
 
         return false;

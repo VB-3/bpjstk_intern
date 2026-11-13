@@ -245,7 +245,7 @@
                                                     <span class="font-extrabold {{ $isHarian ? 'text-green-700' : 'text-purple-700' }}">
                                                         {{ $att->check_in_time ? \Carbon\Carbon::parse($att->check_in_time)->format('H:i') : '--:--' }}
                                                     </span>
-                                                    @if($att->check_in_photo)
+                                                    @if($att->check_in_photo && auth()->user()->canViewAttendancePhoto($att))
                                                         <a href="{{ route('attendances.photo', ['attendance' => $att->id, 'type' => 'check_in']) }}"
                                                            @click.prevent="activePhotoUrl = '{{ route('attendances.photo', ['attendance' => $att->id, 'type' => 'check_in']) }}'; activePhotoTitle = 'Foto Check-In ({{ $isHarian ? 'Harian' : 'Luar Harian' }})'; showPhotoModal = true"
                                                            target="_blank"
@@ -258,7 +258,7 @@
                                                     <span class="font-extrabold text-red-500">
                                                         {{ $att->check_out_time ? \Carbon\Carbon::parse($att->check_out_time)->format('H:i') : '--:--' }}
                                                     </span>
-                                                    @if($att->check_out_photo)
+                                                    @if($att->check_out_photo && auth()->user()->canViewAttendancePhoto($att))
                                                         <a href="{{ route('attendances.photo', ['attendance' => $att->id, 'type' => 'check_out']) }}"
                                                            @click.prevent="activePhotoUrl = '{{ route('attendances.photo', ['attendance' => $att->id, 'type' => 'check_out']) }}'; activePhotoTitle = 'Foto Check-Out ({{ $isHarian ? 'Harian' : 'Luar Harian' }})'; showPhotoModal = true"
                                                            target="_blank"

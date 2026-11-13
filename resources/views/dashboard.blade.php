@@ -479,7 +479,7 @@
                                             <span class="font-extrabold {{ $isHarian ? 'text-green-600' : 'text-purple-600' }}">
                                                 {{ $attendance->check_in_time ? \Carbon\Carbon::parse($attendance->check_in_time)->format('H:i') : '--:--' }}
                                             </span>
-                                            @if($attendance->check_in_photo)
+                                            @if($attendance->check_in_photo && auth()->user()->canViewAttendancePhoto($attendance))
                                                 <a href="{{ route('attendances.photo', ['attendance' => $attendance->id, 'type' => 'check_in']) }}" target="_blank"
                                                    class="text-[10px] text-blue-600 hover:underline font-semibold ml-0.5">Foto</a>
                                             @endif
@@ -490,7 +490,7 @@
                                             <span class="font-extrabold text-red-500">
                                                 {{ $attendance->check_out_time ? \Carbon\Carbon::parse($attendance->check_out_time)->format('H:i') : '--:--' }}
                                             </span>
-                                            @if($attendance->check_out_photo)
+                                            @if($attendance->check_out_photo && auth()->user()->canViewAttendancePhoto($attendance))
                                                 <a href="{{ route('attendances.photo', ['attendance' => $attendance->id, 'type' => 'check_out']) }}" target="_blank"
                                                    class="text-[10px] text-blue-600 hover:underline font-semibold ml-0.5">Foto</a>
                                             @endif
