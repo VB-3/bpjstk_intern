@@ -143,12 +143,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Galeri Foto Absensi (khusus superadmin dengan akses foto)
         Route::get('/attendance-gallery', [\App\Http\Controllers\SuperAdmin\AttendanceGalleryController::class, 'index'])->name('attendance-gallery.index');
-
-        // Mentor Performance (Rekapitulasi Target & Realisasi) - editable dari dashboard
-        Route::post('/mentor-performance', [\App\Http\Controllers\SuperAdmin\MentorPerformanceController::class, 'store'])->name('mentor-performance.store');
-        Route::put('/mentor-performance/{performance}', [\App\Http\Controllers\SuperAdmin\MentorPerformanceController::class, 'update'])->name('mentor-performance.update');
-        Route::delete('/mentor-performance/{performance}', [\App\Http\Controllers\SuperAdmin\MentorPerformanceController::class, 'destroy'])->name('mentor-performance.destroy');
-        Route::post('/mentor-performance/sync', [\App\Http\Controllers\SuperAdmin\MentorPerformanceController::class, 'syncFromSheet'])->name('mentor-performance.sync');
     });
 });
 
