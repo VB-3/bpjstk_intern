@@ -11,9 +11,27 @@ class AttendanceController extends Controller
 {
     public function index()
     {
-        $attendances = Attendance::where('user_id', auth()->id())->orderBy('date', 'desc')->paginate(4);
-        $todayAttendance = Attendance::where('user_id', auth()->id())->where('date', date('Y-m-d'))->first();
-        return view('attendances.index', compact('attendances', 'todayAttendance'));
+        $attendances = Attendance::where('user_id', auth()->id())
+            ->orderBy('date', 'desc')
+            ->orderBy('check_in_time', 'desc')
+            ->paginate(6);
+
+        // Ambil semua absensi hari ini (bisa lebih dari 1)
+        $todayAttendances = Attendance::where('user_id', auth()->id())
+            ->where('date', date('Y-m-d'))
+            ->orderBy('check_in_time')
+            ->get();
+
+        // Cek status per tipe
+        $todayHarian     = $todayAttendances->firstWhere('type', 'harian');
+        $todayLuarHarian = $todayAttendances->firstWhere('type', 'luar_harian');
+
+        return view('attendances.index', compact(
+            'attendances',
+            'todayAttendances',
+            'todayHarian',
+            'todayLuarHarian'
+        ));
     }
 
     public function checkIn(Request $request)
@@ -23,51 +41,75 @@ class AttendanceController extends Controller
             'check_in_photo' => 'required',
         ]);
 
-        $image      = $request->check_in_photo;
-        $imageParts = explode(";base64,", $image);
-        $imageType  = explode("image/", $imageParts[0])[1];
+        $type = $request->type;
+
+        // Cek apakah tipe ini sudah check-in hari ini
+        $existing = Attendance::where('user_id', auth()->id())
+            ->where('date', date('Y-m-d'))
+            ->where('type', $type)
+            ->first();
+
+        if ($existing) {
+            $label = $type === 'harian' ? 'Harian' : 'Luar Harian';
+            return redirect()->back()->with('error', "Kamu sudah check-in untuk kegiatan {$label} hari ini.");
+        }
+
+        $image       = $request->check_in_photo;
+        $imageParts  = explode(";base64,", $image);
+        $imageType   = explode("image/", $imageParts[0])[1];
         $imageBase64 = base64_decode($imageParts[1]);
-        $fileName   = 'checkin_' . auth()->id() . '_' . time() . '.' . $imageType;
+        $fileName    = 'checkin_' . auth()->id() . '_' . $type . '_' . time() . '.' . $imageType;
         Storage::disk('public')->put('attendances/' . $fileName, $imageBase64);
 
         Attendance::create([
             'user_id'        => auth()->id(),
             'date'           => date('Y-m-d'),
-            'type'           => $request->type,
+            'type'           => $type,
             'check_in_time'  => now(),
             'check_in_photo' => 'attendances/' . $fileName,
         ]);
 
-        return redirect()->back()->with('success', 'Check-in berhasil!');
+        $label = $type === 'harian' ? 'Harian' : 'Luar Harian';
+        return redirect()->back()->with('success', "Check-in {$label} berhasil!");
     }
 
     public function checkOut(Request $request)
     {
-        $attendance = Attendance::where('user_id', auth()->id())->where('date', date('Y-m-d'))->first();
+        $request->validate([
+            'type'            => 'required|in:harian,luar_harian',
+            'check_out_photo' => 'required',
+        ]);
+
+        $type = $request->type;
+
+        $attendance = Attendance::where('user_id', auth()->id())
+            ->where('date', date('Y-m-d'))
+            ->where('type', $type)
+            ->first();
+
+        $label = $type === 'harian' ? 'Harian' : 'Luar Harian';
 
         if (!$attendance) {
-            return redirect()->back()->with('error', 'Anda belum melakukan check-in hari ini.');
+            return redirect()->back()->with('error', "Kamu belum check-in untuk kegiatan {$label} hari ini.");
         }
 
         if ($attendance->check_out_time) {
-            return redirect()->back()->with('error', 'Anda sudah melakukan check-out hari ini.');
+            return redirect()->back()->with('error', "Kamu sudah check-out untuk kegiatan {$label} hari ini.");
         }
 
-        // Validasi To-Do List
-        $todo = Todo::where('user_id', auth()->id())->where('date', date('Y-m-d'))->first();
-        if (!$todo) {
-            return redirect()->back()->with('error', 'Anda harus mengisi To-Do List (Rangkuman Kegiatan) hari ini sebelum melakukan Check-out.');
+        // Validasi To-Do List hanya untuk absensi Harian
+        if ($type === 'harian') {
+            $todo = Todo::where('user_id', auth()->id())->where('date', date('Y-m-d'))->first();
+            if (!$todo) {
+                return redirect()->back()->with('error', 'Kamu harus mengisi To-Do List (Rangkuman Kegiatan) hari ini sebelum Check-out Harian.');
+            }
         }
-
-        $request->validate([
-            'check_out_photo' => 'required',
-        ]);
 
         $image       = $request->check_out_photo;
         $imageParts  = explode(";base64,", $image);
         $imageType   = explode("image/", $imageParts[0])[1];
         $imageBase64 = base64_decode($imageParts[1]);
-        $fileName    = 'checkout_' . auth()->id() . '_' . time() . '.' . $imageType;
+        $fileName    = 'checkout_' . auth()->id() . '_' . $type . '_' . time() . '.' . $imageType;
         Storage::disk('public')->put('attendances/' . $fileName, $imageBase64);
 
         $attendance->update([
@@ -75,6 +117,6 @@ class AttendanceController extends Controller
             'check_out_photo' => 'attendances/' . $fileName,
         ]);
 
-        return redirect()->back()->with('success', 'Check-out berhasil!');
+        return redirect()->back()->with('success', "Check-out {$label} berhasil!");
     }
 }

@@ -458,7 +458,7 @@
 
                             {{-- colour stripe --}}
 
-                            <div class="w-1.5 h-10 bg-gradient-to-b from-green-400 to-green-600 rounded-full shrink-0"></div>
+                            <div class="w-1.5 h-10 {{ $attendance->type === 'harian' ? 'bg-gradient-to-b from-green-400 to-green-600' : 'bg-gradient-to-b from-purple-400 to-purple-600' }} rounded-full shrink-0"></div>
 
                             {{-- date + type --}}
 
@@ -466,7 +466,9 @@
 
                                 <p class="font-bold text-gray-900 text-sm truncate">{{ \Carbon\Carbon::parse($attendance->date)->translatedFormat('l, d F Y') }}</p>
 
-                                <span class="badge bg-green-100 text-green-800 capitalize mt-1">{{ str_replace('_', ' ', $attendance->type) }}</span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold mt-1 {{ $attendance->type === 'harian' ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-purple-100 text-purple-800 border border-purple-200' }}">
+                                    {{ $attendance->type === 'harian' ? 'Harian' : 'Luar Harian' }}
+                                </span>
 
                             </div>
 

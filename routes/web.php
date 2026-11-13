@@ -17,7 +17,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return redirect()->route('mentor.dashboard');
         }
         
-        $attendances = \App\Models\Attendance::where('user_id', auth()->id())->orderBy('date', 'desc')->take(5)->get();
+        $attendances = \App\Models\Attendance::where('user_id', auth()->id())
+            ->orderBy('date', 'desc')
+            ->orderBy('check_in_time', 'desc')
+            ->take(6)
+            ->get();
         $tasks = \App\Models\TaskSubmission::with('assignedTask')->where('user_id', auth()->id())->orderBy('submitted_at', 'desc')->take(5)->get();
 
         // Leaderboard BPU realtime dari Google Spreadsheet
