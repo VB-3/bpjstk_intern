@@ -25,10 +25,40 @@ class DashboardController extends Controller
                 ->orderBy('name')
                 ->get();
 
+            $selectedDate = now()->toDateString();
+            $snapshot = null;
+            $previousSnapshot = null;
+            $snapshotsList = collect();
+
+            if (\Illuminate\Support\Facades\Schema::hasTable('mentor_performance_snapshots')) {
+                if ($mentorPerformance && !empty($mentorPerformance->categories)) {
+                    try {
+                        \App\Models\MentorPerformanceSnapshot::recordCurrentSnapshot($mentorPerformance);
+                    } catch (\Exception $e) {}
+                }
+
+                $snapshot = \App\Models\MentorPerformanceSnapshot::where('snapshot_date', $selectedDate)->first();
+                if (!$snapshot) {
+                    $snapshot = \App\Models\MentorPerformanceSnapshot::orderByDesc('snapshot_date')->first();
+                }
+
+                if ($snapshot) {
+                    $previousSnapshot = \App\Models\MentorPerformanceSnapshot::where('snapshot_date', '<', $snapshot->snapshot_date)
+                        ->orderByDesc('snapshot_date')
+                        ->first();
+                }
+
+                $snapshotsList = \App\Models\MentorPerformanceSnapshot::orderByDesc('snapshot_date')->take(7)->get();
+            }
+
             return view('superadmin.mentor_monitoring', compact(
                 'totalMentors',
                 'mentorPerformance',
-                'mentorsList'
+                'mentorsList',
+                'selectedDate',
+                'snapshot',
+                'previousSnapshot',
+                'snapshotsList'
             ));
         }
 

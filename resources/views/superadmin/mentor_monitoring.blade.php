@@ -61,6 +61,11 @@
             </div>
         </div>
 
+        {{-- ════════════════════════════════════════════════════════════
+             CARD NOTIFIKASI PEMBARUAN SPREADSHEET (DI ATAS STATISTIK CAPAIAN)
+        ════════════════════════════════════════════════════════════ --}}
+        @include('superadmin.partials.mentor_notification_card')
+
         {{-- Stat Cards --}}
         @php
             $catPu    = $mentorPerformance->categories['tk_pu_aktif'] ?? null;

@@ -37,49 +37,56 @@
              SECTION 1 — Filter Kalender + Status Bar
              Dibagi 2 bagian: bar utama (judul + date picker) dan sub-bar (status + quick nav)
         ════════════════════════════════════════════════════════════════ --}}
-        <div class="rounded-2xl overflow-hidden shadow"
+        <div class="rounded-2xl shadow-md border border-green-800/30 overflow-hidden"
              style="background: linear-gradient(135deg, #15803d 0%, #166534 55%, #14532d 100%);">
 
             {{-- Baris utama: judul kiri, date picker kanan --}}
-            <div class="relative p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 overflow-hidden">
+            <div class="relative p-5 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 {{-- dekorasi lingkaran --}}
-                <div class="pointer-events-none absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/10"></div>
-                <div class="pointer-events-none absolute -bottom-8 left-16 w-28 h-28 rounded-full bg-yellow-300/10"></div>
+                <div class="pointer-events-none absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/10 blur-xl"></div>
+                <div class="pointer-events-none absolute -bottom-8 left-16 w-28 h-28 rounded-full bg-yellow-300/10 blur-lg"></div>
 
                 {{-- Judul --}}
-                <div class="relative flex items-center gap-3">
-                    <div class="shrink-0 w-11 h-11 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-yellow-300">
+                <div class="relative z-10 flex items-center gap-3.5">
+                    <div class="shrink-0 w-11 h-11 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-yellow-300 shadow-inner">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
-                            <h3 class="text-lg font-extrabold text-white leading-tight">Riwayat Rekapitulasi Capaian Mentor</h3>
-                            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-yellow-400/20 text-yellow-300 border border-yellow-300/30 leading-none">
+                            <h3 class="text-base sm:text-lg font-extrabold text-white leading-tight">Riwayat Rekapitulasi Capaian Mentor</h3>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-yellow-400/20 text-yellow-300 border border-yellow-300/30 leading-none">
                                 Arsip Harian
                             </span>
                         </div>
-                        <p class="text-green-100/80 text-xs mt-0.5">Periksa kondisi data pada tanggal tertentu menggunakan kalender.</p>
+                        <p class="text-green-100/90 text-xs mt-0.5">Periksa kondisi data pada tanggal tertentu menggunakan kalender.</p>
                     </div>
                 </div>
 
-                {{-- Date Picker --}}
-                <div class="relative shrink-0">
+                {{-- Date Picker Kalender & Tombol Lihat Data (Tampilan Jelas & Pasti Terlihat) --}}
+                <div class="relative z-10 w-full lg:w-auto shrink-0">
                     <form method="GET" action="{{ route('superadmin.mentor-history.index') }}"
-                          class="flex items-center gap-2">
+                          class="flex flex-wrap sm:flex-nowrap items-center gap-2 bg-black/25 backdrop-blur-md p-1.5 rounded-2xl border border-white/20 shadow-inner">
+                        <div class="flex items-center gap-1.5 pl-2 text-white">
+                            <svg class="w-4 h-4 text-yellow-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <span class="text-xs font-bold text-yellow-300 uppercase tracking-wider hidden sm:inline">Pilih:</span>
+                        </div>
                         <input type="date"
                                id="date-picker"
                                name="date"
                                value="{{ $selectedDate }}"
                                max="{{ now()->toDateString() }}"
-                               class="bg-white text-gray-800 font-semibold px-3 py-2 rounded-xl text-sm border-0 outline-none focus:ring-2 focus:ring-yellow-400 cursor-pointer shadow-sm">
+                               onchange="this.form.submit()"
+                               class="bg-white text-gray-900 font-bold px-3 py-2 rounded-xl text-xs sm:text-sm border-0 focus:ring-2 focus:ring-yellow-400 shadow cursor-pointer min-w-[150px] flex-1 sm:flex-initial">
                         <button type="submit"
-                                class="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 bg-yellow-400 hover:bg-yellow-300 text-green-900 font-bold text-sm rounded-xl shadow-sm transition-colors whitespace-nowrap">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-yellow-400 hover:bg-yellow-300 active:scale-95 text-green-950 font-extrabold text-xs sm:text-sm rounded-xl shadow-md border border-yellow-200 transition-all shrink-0 cursor-pointer">
+                            <svg class="w-4 h-4 text-green-950 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
-                            Lihat Data
+                            <span>Lihat Data</span>
                         </button>
                     </form>
                 </div>
@@ -149,207 +156,9 @@
             @endphp
 
             {{-- ════════════════════════════════════════════════════════════
-                 CARD NOTIFIKASI PERUBAHAN — bandingkan snapshot vs sebelumnya
+                 CARD NOTIFIKASI PEMBARUAN SPREADSHEET (DI ATAS RINGKASAN CAPAIAN)
             ════════════════════════════════════════════════════════════ --}}
-            @if($snapshot && $previousSnapshot && $snapshot->has_changed)
-                @php
-                    $currCats = is_array($snapshot->categories)
-                        ? $snapshot->categories
-                        : json_decode($snapshot->categories, true);
-                    $prevCats = is_array($previousSnapshot->categories)
-                        ? $previousSnapshot->categories
-                        : json_decode($previousSnapshot->categories, true);
-
-                    // Kumpulkan semua perubahan per mentor per kategori
-                    $changes = [];
-                    foreach ($currCats as $catKey => $currCat) {
-                        $prevCat  = $prevCats[$catKey] ?? null;
-                        $catTitle = $currCat['title'] ?? $catKey;
-
-                        // Index mentor sebelumnya by name agar mudah dicari
-                        $prevMentorMap = [];
-                        if ($prevCat) {
-                            foreach ($prevCat['mentors'] ?? [] as $pm) {
-                                $prevMentorMap[strtolower(trim($pm['name']))] = $pm;
-                            }
-                        }
-
-                        foreach ($currCat['mentors'] ?? [] as $cm) {
-                            $key = strtolower(trim($cm['name']));
-                            $pm  = $prevMentorMap[$key] ?? null;
-                            if (!$pm) continue;
-
-                            $diffTarget    = (int)($cm['target']    ?? 0) - (int)($pm['target']    ?? 0);
-                            $diffRealisasi = (int)($cm['realisasi'] ?? 0) - (int)($pm['realisasi'] ?? 0);
-
-                            if ($diffTarget !== 0 || $diffRealisasi !== 0) {
-                                $changes[] = [
-                                    'name'          => $cm['name'],
-                                    'category'      => $catTitle,
-                                    'diffTarget'    => $diffTarget,
-                                    'diffRealisasi' => $diffRealisasi,
-                                    'prevTarget'    => $pm['target'],
-                                    'currTarget'    => $cm['target'],
-                                    'prevReal'      => $pm['realisasi'],
-                                    'currReal'      => $cm['realisasi'],
-                                    'prevPercent'   => $pm['percent'],
-                                    'currPercent'   => $cm['percent'],
-                                ];
-                            }
-                        }
-
-                        // Cek juga perubahan total
-                        $prevTotal = $prevCat['total'] ?? null;
-                        $currTotal = $currCat['total'] ?? null;
-                    }
-                @endphp
-
-                @if(count($changes) > 0)
-                    {{-- Ada perubahan spesifik --}}
-                    <div class="rounded-2xl overflow-hidden shadow border border-emerald-200">
-                        {{-- Header notifikasi --}}
-                        <div class="bg-emerald-600 px-5 py-3.5 flex items-center justify-between gap-3">
-                            <div class="flex items-center gap-2.5">
-                                <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white shrink-0">
-                                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:18px;height:18px">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <h4 class="font-extrabold text-white text-sm leading-tight">📊 Pembaruan Data Terdeteksi</h4>
-                                    <p class="text-emerald-100 text-xs mt-0.5">
-                                        Dibandingkan dengan snapshot
-                                        <strong class="text-white">{{ $previousSnapshot->snapshot_date->translatedFormat('d F Y') }}</strong>
-                                        — ditemukan <strong class="text-yellow-300">{{ count($changes) }} perubahan</strong>
-                                    </p>
-                                </div>
-                            </div>
-                            <span class="shrink-0 inline-flex items-center px-2.5 py-1 rounded-full bg-white/20 text-white text-xs font-bold">
-                                {{ $snapshot->snapshot_date->translatedFormat('d F Y') }}
-                            </span>
-                        </div>
-
-                        {{-- Daftar perubahan --}}
-                        <div class="bg-white divide-y divide-gray-50">
-                            @foreach($changes as $i => $ch)
-                                @php
-                                    $rUp = $ch['diffRealisasi'] > 0;
-                                    $rDn = $ch['diffRealisasi'] < 0;
-                                    $tUp = $ch['diffTarget'] > 0;
-                                    $tDn = $ch['diffTarget'] < 0;
-                                @endphp
-                                <div class="px-5 py-3.5 flex flex-col sm:flex-row sm:items-center gap-3">
-                                    {{-- Avatar + nama --}}
-                                    <div class="flex items-center gap-3 min-w-0 sm:w-56 shrink-0">
-                                        <div class="w-9 h-9 rounded-xl {{ $rUp ? 'bg-emerald-100 text-emerald-700' : ($rDn ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-700') }} flex items-center justify-center font-extrabold text-sm shrink-0">
-                                            {{ strtoupper(substr($ch['name'], 0, 1)) }}
-                                        </div>
-                                        <div class="min-w-0">
-                                            <p class="font-bold text-gray-900 text-sm truncate">{{ $ch['name'] }}</p>
-                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-500">{{ $ch['category'] }}</span>
-                                        </div>
-                                    </div>
-
-                                    {{-- Kolom perubahan --}}
-                                    <div class="flex flex-wrap items-center gap-2 flex-1 text-xs">
-
-                                        {{-- Realisasi --}}
-                                        @if($ch['diffRealisasi'] !== 0)
-                                            <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl {{ $rUp ? 'bg-emerald-50 border border-emerald-200' : 'bg-red-50 border border-red-200' }}">
-                                                <svg class="w-3.5 h-3.5 {{ $rUp ? 'text-emerald-600' : 'text-red-500' }} shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="{{ $rUp ? 'M5 10l7-7m0 0l7 7m-7-7v18' : 'M19 14l-7 7m0 0l-7-7m7 7V3' }}"/>
-                                                </svg>
-                                                <span class="font-semibold {{ $rUp ? 'text-emerald-700' : 'text-red-600' }}">Realisasi</span>
-                                                <span class="text-gray-400">{{ $ch['prevReal'] }}</span>
-                                                <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                                </svg>
-                                                <span class="font-extrabold {{ $rUp ? 'text-emerald-800' : 'text-red-700' }}">{{ $ch['currReal'] }}</span>
-                                                <span class="font-bold {{ $rUp ? 'text-emerald-600' : 'text-red-500' }}">
-                                                    ({{ $rUp ? '+' : '' }}{{ $ch['diffRealisasi'] }})
-                                                </span>
-                                            </div>
-                                        @endif
-
-                                        {{-- Target --}}
-                                        @if($ch['diffTarget'] !== 0)
-                                            <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl {{ $tUp ? 'bg-blue-50 border border-blue-200' : 'bg-orange-50 border border-orange-200' }}">
-                                                <svg class="w-3.5 h-3.5 {{ $tUp ? 'text-blue-500' : 'text-orange-500' }} shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="{{ $tUp ? 'M5 10l7-7m0 0l7 7m-7-7v18' : 'M19 14l-7 7m0 0l-7-7m7 7V3' }}"/>
-                                                </svg>
-                                                <span class="font-semibold {{ $tUp ? 'text-blue-700' : 'text-orange-700' }}">Target</span>
-                                                <span class="text-gray-400">{{ $ch['prevTarget'] }}</span>
-                                                <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                                </svg>
-                                                <span class="font-extrabold {{ $tUp ? 'text-blue-800' : 'text-orange-700' }}">{{ $ch['currTarget'] }}</span>
-                                                <span class="font-bold {{ $tUp ? 'text-blue-600' : 'text-orange-500' }}">
-                                                    ({{ $tUp ? '+' : '' }}{{ $ch['diffTarget'] }})
-                                                </span>
-                                            </div>
-                                        @endif
-
-                                        {{-- % Capaian berubah --}}
-                                        @if($ch['prevPercent'] !== $ch['currPercent'])
-                                            <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 border border-purple-200">
-                                                <span class="text-purple-600 font-semibold">% Capaian</span>
-                                                <span class="text-gray-400">{{ $ch['prevPercent'] }}</span>
-                                                <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                                </svg>
-                                                <span class="font-extrabold text-purple-800">{{ $ch['currPercent'] }}</span>
-                                            </div>
-                                        @endif
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-
-                        {{-- Footer --}}
-                        <div class="bg-gray-50 border-t border-gray-100 px-5 py-2.5 flex items-center justify-between">
-                            <span class="text-xs text-gray-400">
-                                Snapshot disimpan: <strong class="text-gray-600">{{ $snapshot->updated_at->format('H:i:s, d/m/Y') }}</strong>
-                            </span>
-                            <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">{{ count($changes) }} item berubah</span>
-                        </div>
-                    </div>
-
-                @else
-                    {{-- Checksum berubah tapi perubahan tidak terdeteksi per mentor — tampilkan notif umum --}}
-                    <div class="flex items-start gap-3 p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
-                        <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="font-bold text-emerald-900 text-sm">📊 Ada pembaruan data pada tanggal ini</p>
-                            <p class="text-xs text-emerald-700 mt-0.5">Data berubah dibanding snapshot sebelumnya ({{ $previousSnapshot->snapshot_date->translatedFormat('d F Y') }}), namun detail perubahan tidak dapat dihitung karena format data.</p>
-                        </div>
-                    </div>
-                @endif
-
-            @elseif($snapshot && !$snapshot->has_changed)
-                {{-- Data tidak berubah --}}
-                <div class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-gray-50 border border-gray-200 text-sm">
-                    <div class="w-7 h-7 rounded-lg bg-gray-200 text-gray-500 flex items-center justify-center shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                        </svg>
-                    </div>
-                    <span class="text-gray-600">Data pada tanggal ini <strong class="text-gray-800">tidak ada perubahan</strong> dibanding snapshot sebelumnya ({{ $previousSnapshot?->snapshot_date?->translatedFormat('d F Y') ?? '–' }}).</span>
-                </div>
-            @elseif(!$snapshot)
-                {{-- Belum ada snapshot, menampilkan data live --}}
-                <div class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-blue-50 border border-blue-200 text-sm">
-                    <div class="w-7 h-7 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
-                    <span class="text-blue-700">Menampilkan <strong>data live</strong> dari spreadsheet — belum ada snapshot tersimpan untuk tanggal ini.</span>
-                </div>
-            @endif
+            @include('superadmin.partials.mentor_notification_card')
 
             {{-- Stat cards --}}
             <div>
