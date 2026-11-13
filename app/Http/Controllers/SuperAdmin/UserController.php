@@ -12,7 +12,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        $query = User::query();
+        $query = User::query()->withCount(['mentees', 'assignedTasks']);
 
         if (request()->filled('search')) {
             $search = request('search');
