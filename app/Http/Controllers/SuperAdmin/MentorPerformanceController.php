@@ -15,6 +15,12 @@ class MentorPerformanceController extends Controller
     public function __construct(GoogleSheetsService $sheets)
     {
         $this->sheets = $sheets;
+        $this->middleware(function ($request, $next) {
+            if (auth()->user()?->email !== 'medankota@superadmin.com') {
+                abort(403, 'Akses khusus untuk superadmin medankota.');
+            }
+            return $next($request);
+        });
     }
 
     /**
@@ -22,6 +28,10 @@ class MentorPerformanceController extends Controller
      */
     public function index()
     {
+        if (auth()->user()?->email !== 'medankota@superadmin.com') {
+            abort(403, 'Akses khusus untuk superadmin medankota.');
+        }
+
         $mentorsList = User::where('role', 'mentor')
             ->withCount('mentees', 'assignedTasks')
             ->orderBy('name')
