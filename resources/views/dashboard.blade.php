@@ -452,52 +452,46 @@
 
                 <div class="p-5 flex-1 space-y-3">
 
-                    @forelse($attendances as $attendance)
-
-                        <div class="flex items-center gap-4 bg-white rounded-2xl px-4 py-3.5 border border-gray-100 hover:border-green-200 hover:shadow-sm transition-all">
-
-                            {{-- colour stripe --}}
-
-                            <div class="w-1.5 h-10 {{ $attendance->type === 'harian' ? 'bg-gradient-to-b from-green-400 to-green-600' : 'bg-gradient-to-b from-purple-400 to-purple-600' }} rounded-full shrink-0"></div>
-
-                            {{-- date + type --}}
-
-                            <div class="flex-1 min-w-0">
-
-                                <p class="font-bold text-gray-900 text-sm truncate">{{ \Carbon\Carbon::parse($attendance->date)->translatedFormat('l, d F Y') }}</p>
-
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold mt-1 {{ $attendance->type === 'harian' ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-purple-100 text-purple-800 border border-purple-200' }}">
-                                    {{ $attendance->type === 'harian' ? 'Harian' : 'Luar Harian' }}
-                                </span>
-
-                            </div>
-
-                            {{-- times --}}
-
-                            <div class="flex items-center gap-3 shrink-0">
-
-                                <div class="text-center">
-
-                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">In</p>
-
-                                    <p class="text-sm font-extrabold text-green-600">{{ $attendance->check_in_time ? \Carbon\Carbon::parse($attendance->check_in_time)->format('H:i') : '--:--' }}</p>
-
-                                </div>
-
-                                <div class="w-px h-8 bg-gray-200"></div>
-
-                                <div class="text-center">
-
-                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Out</p>
-
-                                    <p class="text-sm font-extrabold text-red-500">{{ $attendance->check_out_time ? \Carbon\Carbon::parse($attendance->check_out_time)->format('H:i') : '--:--' }}</p>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
+                    @forelse($attendancesGrouped ?? collect() as $dateStr => $dayAttendances)
+                        <div class="bg-white rounded-2xl p-4 border border-gray-100 hover:border-green-200 hover:shadow-sm transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="min-w-0">
+                                <p class="font-bold text-gray-900 text-sm">
+                                    {{ \Carbon\Carbon::parse($dateStr)->translatedFormat('l, d F Y') }}
+                                </p>
+                                <div class="flex items-center gap-1.5 mt-1">
+                                    @foreach($dayAttendances as $att)
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold {{ $att->type === 'harian' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800' }}">
+                                            {{ $att->type === 'harian' ? 'Harian' : 'Luar Harian' }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col gap-1.5 sm:ml-auto">
+                                @foreach($dayAttendances as $attendance)
+                                    @php $isHarian = $attendance->type === 'harian'; @endphp
+                                    <div class="flex items-center gap-3 bg-gray-50/80 px-3 py-1.5 rounded-xl border border-gray-100 text-xs">
+                                        <span class="text-[11px] font-bold w-20 {{ $isHarian ? 'text-green-700' : 'text-purple-700' }}">
+                                            {{ $isHarian ? 'Harian' : 'Luar Harian' }}
+                                        </span>
+                                        <div class="flex items-center gap-1">
+                                            <span class="text-[10px] font-bold text-gray-400">In:</span>
+                                            <span class="font-extrabold {{ $isHarian ? 'text-green-600' : 'text-purple-600' }}">
+                                                {{ $attendance->check_in_time ? \Carbon\Carbon::parse($attendance->check_in_time)->format('H:i') : '--:--' }}
+                                            </span>
+                                        </div>
+                                        <span class="text-gray-300">|</span>
+                                        <div class="flex items-center gap-1">
+                                            <span class="text-[10px] font-bold text-gray-400">Out:</span>
+                                            <span class="font-extrabold text-red-500">
+                                                {{ $attendance->check_out_time ? \Carbon\Carbon::parse($attendance->check_out_time)->format('H:i') : '--:--' }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+
                     @empty
 
                         <div class="text-center py-10">

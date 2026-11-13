@@ -17,6 +17,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return redirect()->route('mentor.dashboard');
         }
         
+        $recentDates = \App\Models\Attendance::where('user_id', auth()->id())
+            ->select('date')
+            ->distinct()
+            ->orderBy('date', 'desc')
+            ->take(5)
+            ->pluck('date')
+            ->map(function($d) {
+                return $d instanceof \Carbon\Carbon ? $d->format('Y-m-d') : (string)$d;
+            })
+            ->toArray();
+
+        $attendancesGrouped = \App\Models\Attendance::where('user_id', auth()->id())
+            ->whereIn('date', $recentDates)
+            ->orderBy('date', 'desc')
+            ->orderBy('check_in_time', 'asc')
+            ->get()
+            ->groupBy(function($item) {
+                return $item->date instanceof \Carbon\Carbon ? $item->date->format('Y-m-d') : (string)$item->date;
+            });
+
         $attendances = \App\Models\Attendance::where('user_id', auth()->id())
             ->orderBy('date', 'desc')
             ->orderBy('check_in_time', 'desc')
@@ -43,7 +63,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->whereNotIn('id', $submittedTaskIds)
             ->count();
         
-        return view('dashboard', compact('attendances', 'tasks', 'totalBpu', 'bpuLeaderboard', 'bpuTop3', 'pendingTasksCount'));
+        return view('dashboard', compact('attendances', 'attendancesGrouped', 'tasks', 'totalBpu', 'bpuLeaderboard', 'bpuTop3', 'pendingTasksCount'));
     })->name('dashboard');
 
     // Route leaderboard BPU (accessible oleh semua role)

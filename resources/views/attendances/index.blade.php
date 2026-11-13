@@ -203,59 +203,66 @@
                             </div>
                             <h2 class="text-base font-extrabold text-gray-900">Riwayat Absensi</h2>
                         </div>
-                        <span class="text-xs text-gray-400 font-medium">{{ $attendances->total() }} total catatan</span>
+                        <span class="text-xs text-gray-400 font-medium">{{ $dates->total() }} hari tercatat</span>
                     </div>
 
                     <div class="p-5 flex-1 bg-gray-50/40">
                         <div class="space-y-3">
-                        @forelse($attendances as $att)
+                        @forelse($dates as $dateObj)
                             @php
-                                $isHarian = $att->type === 'harian';
-                                $colorIn  = $isHarian ? 'text-green-600' : 'text-purple-600';
-                                $bgBadge  = $isHarian ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800';
-                                $barColor = $isHarian ? 'from-green-400 to-green-600' : 'from-purple-400 to-purple-600';
+                                $dateStr = $dateObj->date instanceof \Carbon\Carbon ? $dateObj->date->format('Y-m-d') : (string)$dateObj->date;
+                                $dayAttendances = $attendancesGrouped->get($dateStr, collect());
                             @endphp
-                            <div class="bg-white rounded-2xl border border-gray-100 hover:border-green-200 hover:shadow-md transition-all overflow-hidden">
-                                <div class="flex flex-col sm:flex-row sm:items-center gap-4 p-4 sm:p-5">
-                                    {{-- Left: tanggal + tipe --}}
-                                    <div class="flex items-center gap-4 flex-1 min-w-0">
-                                        <div class="w-1.5 h-12 bg-gradient-to-b {{ $barColor }} rounded-full shrink-0 hidden sm:block"></div>
-                                        <div class="min-w-0">
-                                            <p class="font-bold text-gray-900 text-sm truncate">
-                                                {{ \Carbon\Carbon::parse($att->date)->translatedFormat('l, d F Y') }}
+                            <div class="bg-white rounded-2xl border border-gray-100 hover:border-green-200 hover:shadow-md transition-all p-4 sm:p-5">
+                                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                                    {{-- Kiri: Tanggal & Badge Kegiatan --}}
+                                    <div class="flex items-center gap-3.5 min-w-0">
+                                        <div class="w-1.5 h-12 bg-gradient-to-b from-green-500 to-emerald-700 rounded-full shrink-0 hidden sm:block"></div>
+                                        <div>
+                                            <p class="font-bold text-gray-900 text-sm sm:text-base">
+                                                {{ \Carbon\Carbon::parse($dateStr)->translatedFormat('l, d F Y') }}
                                             </p>
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold mt-1 {{ $bgBadge }}">
-                                                {{ $isHarian ? 'Harian' : 'Luar Harian' }}
-                                            </span>
+                                            <div class="flex items-center gap-1.5 mt-1">
+                                                @foreach($dayAttendances as $att)
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold {{ $att->type === 'harian' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800' }}">
+                                                        {{ $att->type === 'harian' ? 'Harian' : 'Luar Harian' }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
                                         </div>
                                     </div>
-                                    {{-- Right: waktu check in/out --}}
-                                    <div class="flex gap-5 bg-gray-50 border border-gray-100 rounded-xl px-5 py-3 sm:ml-auto shrink-0">
-                                        <div>
-                                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Check In</p>
-                                            @if($att->check_in_time)
-                                                <p class="text-sm font-extrabold {{ $colorIn }}">
-                                                    {{ \Carbon\Carbon::parse($att->check_in_time)->format('H:i') }}
-                                                </p>
-                                                <a href="{{ Storage::url($att->check_in_photo) }}" target="_blank"
-                                                   class="text-[11px] text-blue-500 hover:underline font-semibold">Foto</a>
-                                            @else
-                                                <p class="text-sm font-extrabold text-gray-300">--:--</p>
-                                            @endif
-                                        </div>
-                                        <div class="w-px bg-gray-200 self-stretch"></div>
-                                        <div>
-                                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Check Out</p>
-                                            @if($att->check_out_time)
-                                                <p class="text-sm font-extrabold text-red-500">
-                                                    {{ \Carbon\Carbon::parse($att->check_out_time)->format('H:i') }}
-                                                </p>
-                                                <a href="{{ Storage::url($att->check_out_photo) }}" target="_blank"
-                                                   class="text-[11px] text-blue-500 hover:underline font-semibold">Foto</a>
-                                            @else
-                                                <p class="text-sm font-extrabold text-gray-300">--:--</p>
-                                            @endif
-                                        </div>
+
+                                    {{-- Kanan: Histori Jam Check-in & Check-out --}}
+                                    <div class="flex flex-col gap-2 lg:ml-auto">
+                                        @foreach($dayAttendances as $att)
+                                            @php $isHarian = $att->type === 'harian'; @endphp
+                                            <div class="flex items-center gap-4 bg-gray-50/80 border border-gray-100 rounded-xl px-4 py-2 text-xs">
+                                                <span class="font-bold text-[11px] w-24 shrink-0 {{ $isHarian ? 'text-green-700' : 'text-purple-700' }}">
+                                                    {{ $isHarian ? 'Harian' : 'Luar Harian' }}
+                                                </span>
+                                                <div class="flex items-center gap-1.5">
+                                                    <span class="text-[10px] font-bold text-gray-400 uppercase">In:</span>
+                                                    <span class="font-extrabold {{ $isHarian ? 'text-green-700' : 'text-purple-700' }}">
+                                                        {{ $att->check_in_time ? \Carbon\Carbon::parse($att->check_in_time)->format('H:i') : '--:--' }}
+                                                    </span>
+                                                    @if($att->check_in_photo)
+                                                        <a href="{{ Storage::url($att->check_in_photo) }}" target="_blank"
+                                                           class="text-[11px] text-blue-600 hover:underline font-semibold ml-0.5">Foto</a>
+                                                    @endif
+                                                </div>
+                                                <span class="text-gray-300">|</span>
+                                                <div class="flex items-center gap-1.5">
+                                                    <span class="text-[10px] font-bold text-gray-400 uppercase">Out:</span>
+                                                    <span class="font-extrabold text-red-500">
+                                                        {{ $att->check_out_time ? \Carbon\Carbon::parse($att->check_out_time)->format('H:i') : '--:--' }}
+                                                    </span>
+                                                    @if($att->check_out_photo)
+                                                        <a href="{{ Storage::url($att->check_out_photo) }}" target="_blank"
+                                                           class="text-[11px] text-blue-600 hover:underline font-semibold ml-0.5">Foto</a>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @endforeach
                                     </div>
                                 </div>
                             </div>
@@ -272,7 +279,7 @@
 
                         {{-- Pagination --}}
                         <div class="mt-4">
-                            {{ $attendances->links('vendor.pagination.custom') }}
+                            {{ $dates->links('vendor.pagination.custom') }}
                         </div>
                     </div>
                 </div>

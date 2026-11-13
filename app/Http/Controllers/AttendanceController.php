@@ -11,10 +11,26 @@ class AttendanceController extends Controller
 {
     public function index()
     {
-        $attendances = Attendance::where('user_id', auth()->id())
+        // Ambil daftar tanggal unik dengan pagination (6 hari per halaman)
+        $dates = Attendance::where('user_id', auth()->id())
+            ->select('date')
+            ->distinct()
             ->orderBy('date', 'desc')
-            ->orderBy('check_in_time', 'desc')
             ->paginate(6);
+
+        $dateList = $dates->pluck('date')->map(function($d) {
+            return $d instanceof \Carbon\Carbon ? $d->format('Y-m-d') : (string)$d;
+        })->toArray();
+
+        // Ambil data absensi untuk tanggal-tanggal tersebut dan kelompokkan per tanggal
+        $attendancesGrouped = Attendance::where('user_id', auth()->id())
+            ->whereIn('date', $dateList)
+            ->orderBy('date', 'desc')
+            ->orderBy('check_in_time', 'asc')
+            ->get()
+            ->groupBy(function($item) {
+                return $item->date instanceof \Carbon\Carbon ? $item->date->format('Y-m-d') : (string)$item->date;
+            });
 
         // Ambil semua absensi hari ini (bisa lebih dari 1)
         $todayAttendances = Attendance::where('user_id', auth()->id())
@@ -27,7 +43,8 @@ class AttendanceController extends Controller
         $todayLuarHarian = $todayAttendances->firstWhere('type', 'luar_harian');
 
         return view('attendances.index', compact(
-            'attendances',
+            'dates',
+            'attendancesGrouped',
             'todayAttendances',
             'todayHarian',
             'todayLuarHarian'
