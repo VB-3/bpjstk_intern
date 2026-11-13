@@ -21,6 +21,20 @@
 
     <div class="page-wrapper space-y-6">
 
+        {{-- ── Alert jika migrasi belum dijalankan ───────────────────────── --}}
+        @if(!$dbMigrated)
+            <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-3 shadow-sm">
+                <span class="text-xl shrink-0">⚠️</span>
+                <div class="text-xs">
+                    <p class="font-bold text-sm text-amber-950">Tabel database histori belum di-migrasi</p>
+                    <p class="mt-0.5 text-amber-800">
+                        Saat ini data live dari spreadsheet tetap ditampilkan, namun snapshot histori harian belum bisa disimpan permanen.
+                        Silakan jalankan perintah <code class="px-2 py-0.5 rounded bg-amber-200/60 font-mono font-bold text-amber-900">php artisan migrate --force</code> di terminal SSH Dewacloud kamu.
+                    </p>
+                </div>
+            </div>
+        @endif
+
         {{-- ── Hero & Kalender Filter Section ────────────────────────────── --}}
         <div class="relative overflow-hidden rounded-3xl shadow-lg"
              style="background: linear-gradient(135deg, #15803d 0%, #166534 50%, #14532d 100%);">
@@ -77,7 +91,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <p class="text-sm font-extrabold text-gray-900">
-                            Data untuk tanggal: <span class="text-green-700">{{ \Carbon\Carbon::parse($selectedDate)->locale('id')->isoFormat('dddd, D MMMM YYYY') }}</span>
+                            Data untuk tanggal: <span class="text-green-700">{{ \Carbon\Carbon::parse($selectedDate)->translatedFormat('l, d F Y') }}</span>
                         </p>
                         @if($snapshot)
                             @if($snapshot->has_changed)
@@ -93,11 +107,11 @@
                     </div>
                     <p class="text-xs text-gray-500 mt-0.5">
                         @if($isFallbackDate && $snapshot)
-                            <span class="text-amber-600 font-semibold">ℹ️ Pada tanggal ini tidak ada catatan baru, menampilkan data snapshot terakhir tercatat pada {{ $snapshot->snapshot_date->locale('id')->isoFormat('D MMMM YYYY') }}.</span>
+                            <span class="text-amber-600 font-semibold">ℹ️ Pada tanggal ini belum ada catatan baru, menampilkan snapshot terakhir per 24 jam tercatat pada {{ $snapshot->snapshot_date->translatedFormat('d F Y') }}.</span>
                         @elseif($snapshot)
                             Snapshot terakhir per 24 jam diperbarui pada: <strong>{{ $snapshot->updated_at->format('H:i:s, d/m/Y') }}</strong> ({{ $snapshot->header_date ?? '-' }}).
                         @else
-                            Belum ada snapshot histori yang tersimpan.
+                            Menampilkan data live terbaru dari spreadsheet.
                         @endif
                     </p>
                 </div>

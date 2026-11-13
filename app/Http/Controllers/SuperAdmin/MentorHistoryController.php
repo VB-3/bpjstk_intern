@@ -7,6 +7,8 @@ use App\Models\MentorPerformanceSnapshot;
 use App\Models\User;
 use App\Services\GoogleSheetsService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class MentorHistoryController extends Controller
 {
@@ -17,54 +19,79 @@ class MentorHistoryController extends Controller
             abort(403, 'Akses khusus untuk superadmin medankota.');
         }
 
-        // Auto-record snapshot hari ini dari Google Spreadsheet jika ada data terbaru
+        $selectedDate = $request->input('date', now()->toDateString());
+        $dbMigrated = Schema::hasTable('mentor_performance_snapshots');
+        $snapshot = null;
+        $previousSnapshot = null;
+        $isFallbackDate = false;
+        $snapshotsList = collect();
+
+        // Ambil data live dari spreadsheet sebagai fallback atau untuk auto-snapshot
+        $currentPerformance = null;
         try {
             $currentPerformance = $sheetsService->getMentorPerformance();
-            if (!empty($currentPerformance->categories)) {
-                MentorPerformanceSnapshot::recordCurrentSnapshot($currentPerformance);
-            }
         } catch (\Exception $e) {
-            \Log::warning('Auto snapshot mentor performance gagal: ' . $e->getMessage());
+            Log::warning('Gagal mengambil data live spreadsheet: ' . $e->getMessage());
         }
 
-        // Tanggal yang dipilih oleh pengguna (default: hari ini)
-        $selectedDate = $request->input('date', now()->toDateString());
+        if ($dbMigrated) {
+            // Auto-record snapshot hari ini dari Google Spreadsheet
+            if ($currentPerformance && !empty($currentPerformance->categories)) {
+                try {
+                    MentorPerformanceSnapshot::recordCurrentSnapshot($currentPerformance);
+                } catch (\Exception $e) {
+                    Log::warning('Auto snapshot mentor performance gagal: ' . $e->getMessage());
+                }
+            }
 
-        // Cari snapshot untuk tanggal yang dipilih
-        $snapshot = MentorPerformanceSnapshot::where('snapshot_date', $selectedDate)->first();
+            try {
+                // Cari snapshot untuk tanggal yang dipilih
+                $snapshot = MentorPerformanceSnapshot::where('snapshot_date', $selectedDate)->first();
 
-        $isFallbackDate = false;
-        // Jika tidak ada data persis pada tanggal tersebut, cari data terakhir per 24 jam sebelumnya
-        if (!$snapshot) {
-            $snapshot = MentorPerformanceSnapshot::where('snapshot_date', '<=', $selectedDate)
-                ->orderByDesc('snapshot_date')
-                ->first();
+                // Jika tidak ada data persis pada tanggal tersebut, cari data terakhir per 24 jam sebelumnya
+                if (!$snapshot) {
+                    $snapshot = MentorPerformanceSnapshot::where('snapshot_date', '<=', $selectedDate)
+                        ->orderByDesc('snapshot_date')
+                        ->first();
 
-            if ($snapshot) {
-                $isFallbackDate = true;
-            } else {
-                // Fallback terakhir: ambil snapshot paling awal atau terbaru yang ada
-                $snapshot = MentorPerformanceSnapshot::orderByDesc('snapshot_date')->first();
+                    if ($snapshot) {
+                        $isFallbackDate = true;
+                    } else {
+                        // Fallback terakhir: ambil snapshot terbaru yang ada
+                        $snapshot = MentorPerformanceSnapshot::orderByDesc('snapshot_date')->first();
+                    }
+                }
+
+                // Ambil snapshot pembanding sebelumnya (untuk cek riwayat perubahan)
+                if ($snapshot) {
+                    $previousSnapshot = MentorPerformanceSnapshot::where('snapshot_date', '<', $snapshot->snapshot_date)
+                        ->orderByDesc('snapshot_date')
+                        ->first();
+                }
+
+                // Daftar semua tanggal yang memiliki snapshot (untuk navigasi / kalender)
+                $snapshotsList = MentorPerformanceSnapshot::orderByDesc('snapshot_date')->get();
+            } catch (\Exception $e) {
+                Log::error('Error querying MentorPerformanceSnapshot: ' . $e->getMessage());
             }
         }
 
-        // Ambil snapshot pembanding sebelumnya (untuk cek riwayat perubahan)
-        $previousSnapshot = null;
+        // Format data categories agar siap ditampilkan di view
         if ($snapshot) {
-            $previousSnapshot = MentorPerformanceSnapshot::where('snapshot_date', '<', $snapshot->snapshot_date)
-                ->orderByDesc('snapshot_date')
-                ->first();
+            $formattedCategories = $snapshot->getFormattedCategories();
+            $mentorPerformance = (object) [
+                'date'       => $snapshot->header_date ?? $snapshot->snapshot_date->translatedFormat('d F Y'),
+                'categories' => $formattedCategories,
+            ];
+        } elseif ($currentPerformance && !empty($currentPerformance->categories)) {
+            // Fallback jika belum ada snapshot di database: gunakan data live dari spreadsheet
+            $mentorPerformance = $currentPerformance;
+        } else {
+            $mentorPerformance = (object) [
+                'date'       => 'Tidak Ada Data',
+                'categories' => [],
+            ];
         }
-
-        // Daftar semua tanggal yang memiliki snapshot (untuk navigasi / kalender)
-        $snapshotsList = MentorPerformanceSnapshot::orderByDesc('snapshot_date')->get();
-
-        // Format data categories agar sesuai dengan format view
-        $formattedCategories = $snapshot ? $snapshot->getFormattedCategories() : [];
-        $mentorPerformance = (object) [
-            'date'       => $snapshot ? ($snapshot->header_date ?? $snapshot->snapshot_date->locale('id')->isoFormat('D MMMM YYYY')) : 'Tidak Ada Data',
-            'categories' => $formattedCategories,
-        ];
 
         // Daftar akun mentor untuk informasi
         $mentorsList = User::where('role', 'mentor')
@@ -81,7 +108,8 @@ class MentorHistoryController extends Controller
             'snapshotsList',
             'mentorPerformance',
             'mentorsList',
-            'totalMentors'
+            'totalMentors',
+            'dbMigrated'
         ));
     }
 }
