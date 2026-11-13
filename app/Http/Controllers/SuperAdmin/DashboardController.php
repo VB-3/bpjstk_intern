@@ -19,17 +19,7 @@ class DashboardController extends Controller
 
         // Jika akun yang login adalah superadmin khusus monitoring mentor (medankota@superadmin.com)
         if (auth()->user()->email === 'medankota@superadmin.com' || request('view') === 'mentor') {
-            $totalMentors = User::where('role', 'mentor')->count();
-            $mentorsList = User::where('role', 'mentor')
-                ->withCount('mentees', 'assignedTasks')
-                ->orderBy('name')
-                ->get();
-
-            return view('superadmin.mentor_monitoring', compact(
-                'totalMentors',
-                'mentorPerformance',
-                'mentorsList'
-            ));
+            return app(\App\Http\Controllers\SuperAdmin\MentorPerformanceController::class)->index();
         }
 
         $totalUsers = User::count();

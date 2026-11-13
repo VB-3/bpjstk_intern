@@ -161,5 +161,6 @@
         </div>
 
         <x-security-guard />
+        @stack('scripts')
     </body>
 </html>

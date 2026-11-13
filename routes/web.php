@@ -115,6 +115,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/students', [\App\Http\Controllers\SuperAdmin\StudentController::class, 'index'])->name('students.index');
         Route::get('/students/{student}/edit', [\App\Http\Controllers\SuperAdmin\StudentController::class, 'edit'])->name('students.edit');
         Route::patch('/students/todos/{todo}/bpu', [\App\Http\Controllers\SuperAdmin\StudentController::class, 'updateBpu'])->name('students.updateBpu');
+
+        // Mentor Performance (Rekapitulasi Target & Realisasi) - editable dari dashboard
+        Route::post('/mentor-performance', [\App\Http\Controllers\SuperAdmin\MentorPerformanceController::class, 'store'])->name('mentor-performance.store');
+        Route::put('/mentor-performance/{performance}', [\App\Http\Controllers\SuperAdmin\MentorPerformanceController::class, 'update'])->name('mentor-performance.update');
+        Route::delete('/mentor-performance/{performance}', [\App\Http\Controllers\SuperAdmin\MentorPerformanceController::class, 'destroy'])->name('mentor-performance.destroy');
+        Route::post('/mentor-performance/sync', [\App\Http\Controllers\SuperAdmin\MentorPerformanceController::class, 'syncFromSheet'])->name('mentor-performance.sync');
     });
 });
 
