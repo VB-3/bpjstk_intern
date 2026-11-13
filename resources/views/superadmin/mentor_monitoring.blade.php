@@ -1,20 +1,29 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between w-full">
-            <h2 class="font-bold text-xl text-gray-800 leading-tight flex items-center gap-2">
-                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                </svg>
-                Dashboard Monitoring Mentor
+            <h2 class="font-bold text-lg sm:text-xl text-gray-800 leading-tight flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-green-100 text-green-700 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                </div>
+                <span>Dashboard Monitoring Mentor</span>
             </h2>
             <div class="flex items-center gap-2">
+                <a href="{{ route('superadmin.mentor-history.index') }}"
+                   class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 hover:bg-green-100 text-green-800 border border-green-200 font-bold rounded-xl text-xs transition-all shadow-sm">
+                    <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span>Histori Capaian</span>
+                </a>
                 <a href="https://docs.google.com/spreadsheets/d/1TyRm64Onlmpyfqzw3MyICPGpttH-3_rTYOZHFS94iWY/edit?usp=sharing"
                    target="_blank" rel="noopener noreferrer"
-                   class="inline-flex items-center gap-2 px-3.5 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-xs shadow-sm transition-all">
+                   class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-xs shadow-sm transition-all">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                     </svg>
-                    Buka Spreadsheet
+                    <span>Spreadsheet</span>
                 </a>
             </div>
         </div>
@@ -22,29 +31,39 @@
 
     <div class="page-wrapper">
 
-        {{-- ── Hero Welcome Card (Standar Hijau BPJS) ─────────────────────── --}}
-        <div class="relative overflow-hidden rounded-3xl shadow-lg mb-6"
+        {{-- ── Hero Welcome Card (Standar Hijau BPJS Kompak & Proporsional) ─────────────────────── --}}
+        <div class="relative overflow-hidden rounded-2xl shadow-md border border-green-800/20 mb-5"
              style="background: linear-gradient(135deg, #15803d 0%, #166534 50%, #14532d 100%);">
-            <div class="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-white/10 pointer-events-none"></div>
-            <div class="absolute -bottom-12 -left-12 w-48 h-48 rounded-full bg-white/5 pointer-events-none"></div>
+            <div class="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-white/10 blur-xl pointer-events-none"></div>
+            <div class="absolute -bottom-8 -left-8 w-36 h-36 rounded-full bg-yellow-400/10 blur-lg pointer-events-none"></div>
 
-            <div class="relative z-10 p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-                <div class="flex items-center gap-5">
-                    <div class="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white shadow-lg shrink-0 text-2xl font-extrabold overflow-hidden">
-                        <svg class="w-8 h-8 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="relative z-10 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-xl bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center text-yellow-300 shadow-inner shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                         </svg>
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-yellow-400/20 text-yellow-300 border border-yellow-300/30">Super Administrator</span>
-                            <span class="text-xs text-green-200">• Realtime Spreadsheet</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-yellow-400/20 text-yellow-300 border border-yellow-300/30">Super Administrator</span>
+                            <span class="text-xs text-green-200/90">• Realtime Spreadsheet</span>
                         </div>
-                        <h3 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">Pemantauan Progres Mentor (ARK)</h3>
-                        <p class="text-green-100/80 text-sm mt-0.5">
+                        <h3 class="text-base sm:text-lg font-extrabold text-white mt-0.5">Pemantauan Progres Mentor (ARK)</h3>
+                        <p class="text-green-100/85 text-xs mt-0.5">
                             Laporan realisasi target dan capaian {{ $mentorPerformance->date ?? 'terbaru' }} dari para mentor pembimbing.
                         </p>
                     </div>
+                </div>
+
+                <div class="shrink-0 w-full sm:w-auto flex items-center gap-2">
+                    <a href="{{ route('superadmin.mentor-history.index') }}"
+                       class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-yellow-400 hover:bg-yellow-300 text-green-950 font-bold rounded-xl text-xs shadow transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span>Buka Riwayat Kalender</span>
+                    </a>
                 </div>
             </div>
         </div>
