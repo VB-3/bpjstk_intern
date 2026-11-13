@@ -75,7 +75,7 @@
                                 <input type="datetime-local" id="check_in_time" name="check_in_time"
                                     value="{{ old('check_in_time', $attendance->check_in_time ? \Carbon\Carbon::parse($attendance->check_in_time)->format('Y-m-d\TH:i') : '') }}"
                                     class="w-full border @error('check_in_time') border-red-300 ring-2 ring-red-100 @else border-gray-200 @enderror bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 rounded-xl px-4 py-2.5 text-sm font-medium transition-all outline-none">
-                                @if($attendance->check_in_photo)
+                                @if($attendance->check_in_photo && auth()->user()->canViewAttendancePhoto($attendance))
                                     <div class="mt-2 flex items-center gap-2">
                                         <a href="{{ route('attendances.photo', ['attendance' => $attendance->id, 'type' => 'check_in']) }}"
                                            target="_blank"
@@ -97,7 +97,7 @@
                                 <input type="datetime-local" id="check_out_time" name="check_out_time"
                                     value="{{ old('check_out_time', $attendance->check_out_time ? \Carbon\Carbon::parse($attendance->check_out_time)->format('Y-m-d\TH:i') : '') }}"
                                     class="w-full border @error('check_out_time') border-red-300 ring-2 ring-red-100 @else border-gray-200 @enderror bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 rounded-xl px-4 py-2.5 text-sm font-medium transition-all outline-none">
-                                @if($attendance->check_out_photo)
+                                @if($attendance->check_out_photo && auth()->user()->canViewAttendancePhoto($attendance))
                                     <div class="mt-2 flex items-center gap-2">
                                         <a href="{{ route('attendances.photo', ['attendance' => $attendance->id, 'type' => 'check_out']) }}"
                                            target="_blank"

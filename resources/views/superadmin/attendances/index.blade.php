@@ -149,7 +149,7 @@
                                             <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                                 {{ \Carbon\Carbon::parse($attendance->check_in_time)->format('H:i') }}
                                             </span>
-                                            @if($attendance->check_in_photo)
+                                            @if($attendance->check_in_photo && auth()->user()->canViewAttendancePhoto($attendance))
                                                 <a href="{{ route('attendances.photo', ['attendance' => $attendance->id, 'type' => 'check_in']) }}"
                                                    @click.prevent="activePhotoUrl = '{{ route('attendances.photo', ['attendance' => $attendance->id, 'type' => 'check_in']) }}'; activePhotoTitle = 'Foto Check-In: {{ addslashes($attendance->user->name ?? 'Peserta') }} ({{ $attendance->date ? $attendance->date->format('d/m/Y') : '' }})'; showPhotoModal = true"
                                                    class="text-[11px] text-blue-600 hover:text-blue-800 font-semibold hover:underline cursor-pointer flex items-center gap-0.5">
@@ -170,7 +170,7 @@
                                             <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-extrabold bg-red-50 text-red-700 border border-red-200">
                                                 {{ \Carbon\Carbon::parse($attendance->check_out_time)->format('H:i') }}
                                             </span>
-                                            @if($attendance->check_out_photo)
+                                            @if($attendance->check_out_photo && auth()->user()->canViewAttendancePhoto($attendance))
                                                 <a href="{{ route('attendances.photo', ['attendance' => $attendance->id, 'type' => 'check_out']) }}"
                                                    @click.prevent="activePhotoUrl = '{{ route('attendances.photo', ['attendance' => $attendance->id, 'type' => 'check_out']) }}'; activePhotoTitle = 'Foto Check-Out: {{ addslashes($attendance->user->name ?? 'Peserta') }} ({{ $attendance->date ? $attendance->date->format('d/m/Y') : '' }})'; showPhotoModal = true"
                                                    class="text-[11px] text-blue-600 hover:text-blue-800 font-semibold hover:underline cursor-pointer flex items-center gap-0.5">

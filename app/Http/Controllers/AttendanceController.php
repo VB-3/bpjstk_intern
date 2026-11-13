@@ -139,10 +139,9 @@ class AttendanceController extends Controller
 
     public function showPhoto(Attendance $attendance, $type)
     {
-        // Pastikan hanya pemilik, mentornya, atau super admin yang bisa melihat
         $user = auth()->user();
-        if ($user->id !== $attendance->user_id && !$user->isMentor() && !$user->isSuperAdmin()) {
-            abort(403, 'Tidak memiliki akses ke foto ini.');
+        if (!$user->canViewAttendancePhoto($attendance)) {
+            abort(403, 'Anda tidak memiliki akses untuk melihat foto absensi ini.');
         }
 
         $photoPath = $type === 'check_out' ? $attendance->check_out_photo : $attendance->check_in_photo;

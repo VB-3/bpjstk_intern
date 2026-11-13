@@ -66,6 +66,31 @@ class User extends Authenticatable
         return $this->role === 'intern';
     }
 
+    public function canViewAttendancePhoto(?Attendance $attendance = null): bool
+    {
+        // coffebreak khusus tidak diizinkan melihat foto absensi
+        if ($this->email === 'coffebreak@superadmin.com') {
+            return false;
+        }
+
+        // Superadmin lain (seperti kopimanja@superadmin.com) bisa melihat semua foto
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
+        // Mentor bisa melihat foto absensi
+        if ($this->isMentor()) {
+            return true;
+        }
+
+        // Peserta magang hanya bisa melihat foto miliknya sendiri
+        if ($this->isIntern()) {
+            return $attendance ? $attendance->user_id === $this->id : true;
+        }
+
+        return false;
+    }
+
     public function attendances()
     {
         return $this->hasMany(Attendance::class);
