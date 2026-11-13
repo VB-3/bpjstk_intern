@@ -115,7 +115,7 @@
 
             {{-- Grid Foto (1 baris scroll horizontal per peserta) --}}
             <div class="p-5 bg-white/80 overflow-x-auto">
-                <div class="flex gap-4 pb-2" style="min-width: max-content;">
+                <div class="flex gap-5 pb-2" style="min-width: max-content;">
 
                     @foreach($attendances as $attendance)
                     @php
@@ -128,12 +128,12 @@
                         $typeBadge   = $attendance->type === 'harian' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700';
                     @endphp
 
-                    <div class="flex flex-col gap-2 shrink-0 w-[150px]">
+                    <div class="flex flex-col gap-3 shrink-0 w-[220px]">
 
                         {{-- Label tanggal --}}
                         <div class="text-center">
-                            <p class="text-xs font-extrabold text-gray-700">{{ $dateLabel }}</p>
-                            <span class="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full {{ $typeBadge }} mt-0.5">
+                            <p class="text-sm font-extrabold text-gray-700">{{ $dateLabel }}</p>
+                            <span class="inline-block text-[11px] font-bold px-2.5 py-0.5 rounded-full {{ $typeBadge }} mt-1">
                                 {{ $typeLabel }}
                             </span>
                         </div>
@@ -145,18 +145,21 @@
                                      alt="Check In {{ $intern->name }}"
                                      loading="lazy"
                                      onclick="openLightbox('{{ $checkInUrl }}', 'Check-In: {{ addslashes($intern->name) }} — {{ $dateLabel }}')"
-                                     class="w-full h-28 object-cover rounded-xl border-2 border-emerald-200 shadow cursor-pointer transition group-hover:scale-105 group-hover:shadow-lg group-hover:border-emerald-400">
-                                <span class="absolute bottom-1.5 left-1.5 bg-emerald-600/90 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-lg">
+                                     class="w-full h-48 object-cover rounded-2xl border-2 border-emerald-200 shadow-md cursor-pointer transition duration-200 group-hover:scale-105 group-hover:shadow-xl group-hover:border-emerald-400">
+                                <span class="absolute bottom-2 left-2 bg-emerald-600/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-lg shadow">
                                     CHECK IN
                                 </span>
                                 @if($attendance->check_in_time)
-                                <span class="absolute top-1.5 right-1.5 bg-black/60 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-lg">
+                                <span class="absolute top-2 right-2 bg-black/60 text-white text-[11px] font-bold px-2 py-0.5 rounded-lg shadow">
                                     {{ \Carbon\Carbon::parse($attendance->check_in_time)->format('H:i') }}
                                 </span>
                                 @endif
                             @else
-                                <div class="w-full h-28 rounded-xl bg-gray-100 border-2 border-dashed border-gray-200 flex items-center justify-center">
-                                    <span class="text-[10px] text-gray-400 font-semibold text-center px-2">Tidak ada foto<br>check-in</span>
+                                <div class="w-full h-48 rounded-2xl bg-gray-100 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-1">
+                                    <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    <span class="text-xs text-gray-400 font-semibold text-center">Tidak ada foto<br>check-in</span>
                                 </div>
                             @endif
                         </div>
@@ -168,18 +171,21 @@
                                      alt="Check Out {{ $intern->name }}"
                                      loading="lazy"
                                      onclick="openLightbox('{{ $checkOutUrl }}', 'Check-Out: {{ addslashes($intern->name) }} — {{ $dateLabel }}')"
-                                     class="w-full h-28 object-cover rounded-xl border-2 border-rose-200 shadow cursor-pointer transition group-hover:scale-105 group-hover:shadow-lg group-hover:border-rose-400">
-                                <span class="absolute bottom-1.5 left-1.5 bg-rose-600/90 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-lg">
+                                     class="w-full h-48 object-cover rounded-2xl border-2 border-rose-200 shadow-md cursor-pointer transition duration-200 group-hover:scale-105 group-hover:shadow-xl group-hover:border-rose-400">
+                                <span class="absolute bottom-2 left-2 bg-rose-600/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-lg shadow">
                                     CHECK OUT
                                 </span>
                                 @if($attendance->check_out_time)
-                                <span class="absolute top-1.5 right-1.5 bg-black/60 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-lg">
+                                <span class="absolute top-2 right-2 bg-black/60 text-white text-[11px] font-bold px-2 py-0.5 rounded-lg shadow">
                                     {{ \Carbon\Carbon::parse($attendance->check_out_time)->format('H:i') }}
                                 </span>
                                 @endif
                             @else
-                                <div class="w-full h-28 rounded-xl bg-gray-100 border-2 border-dashed border-gray-200 flex items-center justify-center">
-                                    <span class="text-[10px] text-gray-400 font-semibold text-center px-2">Tidak ada foto<br>check-out</span>
+                                <div class="w-full h-48 rounded-2xl bg-gray-100 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-1">
+                                    <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    <span class="text-xs text-gray-400 font-semibold text-center">Tidak ada foto<br>check-out</span>
                                 </div>
                             @endif
                         </div>
