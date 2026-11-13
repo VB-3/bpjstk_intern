@@ -2,110 +2,149 @@
     <x-slot name="header">
         <div class="flex items-center justify-between w-full">
             <h2 class="font-bold text-xl text-gray-800 leading-tight flex items-center gap-2">
-                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                 </svg>
-                Galeri Foto Absensi Peserta Magang
+                Galeri Foto Absensi
             </h2>
+            <div class="text-xs font-semibold text-gray-500 bg-gray-100/80 px-3 py-1.5 rounded-xl border border-gray-200">
+                {{ count($galleryData) }} peserta &middot;
+                @if($filterMonth)
+                    {{ \Carbon\Carbon::createFromFormat('Y-m', $filterMonth)->locale('id')->isoFormat('MMMM YYYY') }}
+                @endif
+            </div>
         </div>
     </x-slot>
 
-    {{-- Lightbox Modal --}}
-    <div id="lightbox" class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center hidden" onclick="closeLightbox()">
-        <button onclick="closeLightbox()" class="absolute top-4 right-4 text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    {{-- Lightbox --}}
+    <div id="lightbox"
+         class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden"
+         onclick="closeLightbox()">
+        <button onclick="closeLightbox()"
+                class="absolute top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
         </button>
-        <div class="max-w-2xl w-full mx-4" onclick="event.stopPropagation()">
-            <img id="lightbox-img" src="" alt="" class="w-full rounded-2xl shadow-2xl max-h-[80vh] object-contain bg-black">
-            <div id="lightbox-caption" class="mt-3 text-center text-white text-sm font-semibold"></div>
+        <div class="max-w-lg w-full mx-6" onclick="event.stopPropagation()">
+            <img id="lightbox-img" src="" alt=""
+                 class="w-full rounded-2xl shadow-2xl max-h-[75vh] object-contain">
+            <p id="lightbox-caption"
+               class="mt-3 text-center text-white/90 text-sm font-semibold"></p>
         </div>
     </div>
 
-    <div class="page-wrapper space-y-6">
+    <div class="page-wrapper space-y-5">
 
-        {{-- Filter Bar --}}
-        <div class="glass-effect rounded-2xl p-5 shadow border border-white/60">
-            <form method="GET" action="{{ route('superadmin.attendance-gallery.index') }}" class="flex flex-wrap items-end gap-4">
-                <div class="flex-1 min-w-[200px]">
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Periode Bulan</label>
-                    <select name="month" onchange="this.form.submit()"
-                        class="w-full border border-gray-200 bg-white rounded-xl px-4 py-2.5 text-sm font-medium text-gray-700 focus:border-green-500 focus:ring-green-500 outline-none shadow-sm">
-                        @foreach($availableMonths as $month)
-                            <option value="{{ $month }}" {{ $filterMonth === $month ? 'selected' : '' }}>
-                                {{ \Carbon\Carbon::createFromFormat('Y-m', $month)->locale('id')->isoFormat('MMMM YYYY') }}
-                            </option>
-                        @endforeach
-                        @if($availableMonths->isEmpty())
-                            <option value="{{ now()->format('Y-m') }}">{{ now()->locale('id')->isoFormat('MMMM YYYY') }}</option>
-                        @endif
-                    </select>
+        {{-- ── Filter ──────────────────────────────────────── --}}
+        <div class="glass-effect rounded-3xl p-6 shadow-md border border-white/60">
+            <form method="GET" action="{{ route('superadmin.attendance-gallery.index') }}"
+                  class="grid grid-cols-1 sm:grid-cols-12 gap-4 items-end">
+
+                {{-- Filter Bulan --}}
+                <div class="sm:col-span-4">
+                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">
+                        Periode Bulan
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <select name="month"
+                                class="w-full pl-9 pr-4 py-2.5 border border-gray-200 bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 rounded-xl text-sm font-medium transition-all outline-none">
+                            @foreach($availableMonths as $month)
+                                <option value="{{ $month }}" {{ $filterMonth === $month ? 'selected' : '' }}>
+                                    {{ \Carbon\Carbon::createFromFormat('Y-m', $month)->locale('id')->isoFormat('MMMM YYYY') }}
+                                </option>
+                            @endforeach
+                            @if($availableMonths->isEmpty())
+                                <option value="{{ now()->format('Y-m') }}">
+                                    {{ now()->locale('id')->isoFormat('MMMM YYYY') }}
+                                </option>
+                            @endif
+                        </select>
+                    </div>
                 </div>
-                <div class="flex-1 min-w-[200px]">
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Filter Peserta</label>
-                    <select name="intern_id" onchange="this.form.submit()"
-                        class="w-full border border-gray-200 bg-white rounded-xl px-4 py-2.5 text-sm font-medium text-gray-700 focus:border-green-500 focus:ring-green-500 outline-none shadow-sm">
-                        <option value="">Semua Peserta</option>
-                        @foreach($interns as $intern)
-                            <option value="{{ $intern->id }}" {{ request('intern_id') == $intern->id ? 'selected' : '' }}>
-                                {{ $intern->name }}
-                            </option>
-                        @endforeach
-                    </select>
+
+                {{-- Filter Peserta --}}
+                <div class="sm:col-span-5">
+                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">
+                        Peserta Magang
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                        </div>
+                        <select name="intern_id"
+                                class="w-full pl-9 pr-4 py-2.5 border border-gray-200 bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 rounded-xl text-sm font-medium transition-all outline-none">
+                            <option value="">Semua Peserta</option>
+                            @foreach($interns as $intern)
+                                <option value="{{ $intern->id }}" {{ request('intern_id') == $intern->id ? 'selected' : '' }}>
+                                    {{ $intern->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
-                <a href="{{ route('superadmin.attendance-gallery.index') }}"
-                   class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-sm font-bold text-gray-600 transition border border-gray-200">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                    </svg>
-                    Reset
-                </a>
+
+                {{-- Tombol --}}
+                <div class="sm:col-span-3 flex items-center gap-2">
+                    <button type="submit"
+                            class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm text-white shadow-md shadow-green-200 hover:shadow-lg transition-all"
+                            style="background: linear-gradient(135deg, #16a34a, #15803d);">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                        </svg>
+                        Filter
+                    </button>
+                    @if(request()->filled('month') || request()->filled('intern_id'))
+                        <a href="{{ route('superadmin.attendance-gallery.index') }}"
+                           class="px-3.5 py-2.5 bg-gray-100 hover:bg-red-50 hover:text-red-600 text-gray-500 rounded-xl text-sm font-semibold border border-gray-200 transition-colors"
+                           title="Reset Filter">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </a>
+                    @endif
+                </div>
             </form>
         </div>
 
-        {{-- Summary --}}
-        <div class="flex items-center gap-3">
-            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                Menampilkan
-                <span class="text-green-700">{{ count($galleryData) }}</span>
-                peserta dengan foto absensi
-                @if($filterMonth)
-                    — <span class="text-green-700">{{ \Carbon\Carbon::createFromFormat('Y-m', $filterMonth)->locale('id')->isoFormat('MMMM YYYY') }}</span>
-                @endif
-            </span>
-        </div>
-
+        {{-- ── Daftar Peserta + Foto ─────────────────────────── --}}
         @forelse($galleryData as $data)
         @php
-            $intern = $data['intern'];
+            $intern     = $data['intern'];
             $attendances = $data['attendances'];
         @endphp
 
-        {{-- Card Per Peserta --}}
-        <div class="glass-effect rounded-3xl overflow-hidden shadow-lg border border-white/60">
+        <div class="glass-effect rounded-3xl overflow-hidden shadow-md border border-white/60">
 
             {{-- Header Peserta --}}
-            <div class="bg-gradient-to-r from-green-700 to-emerald-600 px-6 py-4 flex items-center justify-between gap-4">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100/70 bg-white/80">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center font-extrabold text-white text-base shadow-inner shrink-0">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center font-extrabold text-sm text-white shadow-sm shrink-0"
+                         style="background: linear-gradient(135deg, #16a34a, #15803d);">
                         {{ strtoupper(mb_substr($intern->name, 0, 1)) }}
                     </div>
                     <div>
-                        <p class="font-extrabold text-white text-base leading-tight">{{ $intern->name }}</p>
-                        <p class="text-green-100 text-xs mt-0.5">NIM: {{ $intern->nim ?? '-' }}</p>
+                        <p class="font-bold text-gray-900 text-sm">{{ $intern->name }}</p>
+                        <p class="text-xs text-gray-400 font-medium">NIM: {{ $intern->nim ?? '-' }}</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-2 shrink-0">
-                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-bold">
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 border border-green-200 text-green-700 text-xs font-bold">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        {{ $data['total_foto'] }} Sesi Foto
+                        {{ $data['total_foto'] }} Sesi
                     </span>
                     <a href="{{ route('superadmin.attendances.index', ['user_id' => $intern->id]) }}"
-                       class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/10 hover:bg-white/25 text-white text-xs font-semibold transition border border-white/20">
-                        Lihat Riwayat
+                       class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-semibold transition-colors border border-gray-200">
+                        Riwayat
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                         </svg>
@@ -113,79 +152,83 @@
                 </div>
             </div>
 
-            {{-- Grid Foto (1 baris scroll horizontal per peserta) --}}
-            <div class="p-5 bg-white/80 overflow-x-auto">
-                <div class="flex gap-5 pb-2" style="min-width: max-content;">
+            {{-- Baris foto scroll horizontal --}}
+            <div class="p-5 bg-white/50 overflow-x-auto">
+                <div class="flex gap-4" style="min-width: max-content;">
 
                     @foreach($attendances as $attendance)
                     @php
-                        $hasCheckIn  = !empty($attendance->check_in_photo);
-                        $hasCheckOut = !empty($attendance->check_out_photo);
-                        $checkInUrl  = $hasCheckIn  ? route('attendances.photo', ['attendance' => $attendance->id, 'type' => 'check_in'])  : null;
-                        $checkOutUrl = $hasCheckOut ? route('attendances.photo', ['attendance' => $attendance->id, 'type' => 'check_out']) : null;
-                        $dateLabel   = $attendance->date ? $attendance->date->locale('id')->isoFormat('ddd, D MMM') : '-';
-                        $typeLabel   = $attendance->type === 'harian' ? 'Harian' : 'Luar Harian';
-                        $typeBadge   = $attendance->type === 'harian' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700';
+                        $hasIn      = !empty($attendance->check_in_photo);
+                        $hasOut     = !empty($attendance->check_out_photo);
+                        $urlIn      = $hasIn  ? route('attendances.photo', ['attendance' => $attendance->id, 'type' => 'check_in'])  : null;
+                        $urlOut     = $hasOut ? route('attendances.photo', ['attendance' => $attendance->id, 'type' => 'check_out']) : null;
+                        $tgl        = $attendance->date ? $attendance->date->locale('id')->isoFormat('ddd, D MMM') : '-';
+                        $isHarian   = $attendance->type === 'harian';
                     @endphp
 
-                    <div class="flex flex-col gap-3 shrink-0 w-[220px]">
+                    <div class="flex flex-col gap-2.5 shrink-0 w-[200px]">
 
                         {{-- Label tanggal --}}
-                        <div class="text-center">
-                            <p class="text-sm font-extrabold text-gray-700">{{ $dateLabel }}</p>
-                            <span class="inline-block text-[11px] font-bold px-2.5 py-0.5 rounded-full {{ $typeBadge }} mt-1">
-                                {{ $typeLabel }}
+                        <div class="text-center px-1">
+                            <p class="text-xs font-extrabold text-gray-700">{{ $tgl }}</p>
+                            <span class="inline-block mt-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full
+                                {{ $isHarian ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-blue-100 text-blue-700 border border-blue-200' }}">
+                                {{ $isHarian ? 'Harian' : 'Luar Harian' }}
                             </span>
                         </div>
 
-                        {{-- Foto Check In --}}
+                        {{-- Check In --}}
                         <div class="relative group">
-                            @if($hasCheckIn)
-                                <img src="{{ $checkInUrl }}"
-                                     alt="Check In {{ $intern->name }}"
+                            @if($hasIn)
+                                <img src="{{ $urlIn }}"
+                                     alt="Check In"
                                      loading="lazy"
-                                     onclick="openLightbox('{{ $checkInUrl }}', 'Check-In: {{ addslashes($intern->name) }} — {{ $dateLabel }}')"
-                                     class="w-full h-48 object-cover rounded-2xl border-2 border-emerald-200 shadow-md cursor-pointer transition duration-200 group-hover:scale-105 group-hover:shadow-xl group-hover:border-emerald-400">
-                                <span class="absolute bottom-2 left-2 bg-emerald-600/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-lg shadow">
+                                     onclick="openLightbox('{{ $urlIn }}', 'Check-In: {{ addslashes($intern->name) }} — {{ $tgl }}')"
+                                     class="w-full h-44 object-cover rounded-2xl shadow-sm border border-gray-200 cursor-pointer
+                                            transition duration-200 group-hover:shadow-md group-hover:border-green-400 group-hover:scale-[1.02]">
+                                <div class="absolute inset-0 rounded-2xl bg-black/0 group-hover:bg-black/5 transition duration-200 pointer-events-none"></div>
+                                <span class="absolute bottom-2 left-2 bg-green-600/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-lg shadow-sm">
                                     CHECK IN
                                 </span>
                                 @if($attendance->check_in_time)
-                                <span class="absolute top-2 right-2 bg-black/60 text-white text-[11px] font-bold px-2 py-0.5 rounded-lg shadow">
+                                <span class="absolute top-2 right-2 bg-black/50 text-white text-[10px] font-bold px-2 py-0.5 rounded-lg">
                                     {{ \Carbon\Carbon::parse($attendance->check_in_time)->format('H:i') }}
                                 </span>
                                 @endif
                             @else
-                                <div class="w-full h-48 rounded-2xl bg-gray-100 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-1">
-                                    <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="w-full h-44 rounded-2xl bg-gray-50 border border-dashed border-gray-200 flex flex-col items-center justify-center gap-2">
+                                    <svg class="w-7 h-7 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                     </svg>
-                                    <span class="text-xs text-gray-400 font-semibold text-center">Tidak ada foto<br>check-in</span>
+                                    <span class="text-[10px] text-gray-400 font-semibold text-center leading-tight">Tidak ada<br>foto check-in</span>
                                 </div>
                             @endif
                         </div>
 
-                        {{-- Foto Check Out --}}
+                        {{-- Check Out --}}
                         <div class="relative group">
-                            @if($hasCheckOut)
-                                <img src="{{ $checkOutUrl }}"
-                                     alt="Check Out {{ $intern->name }}"
+                            @if($hasOut)
+                                <img src="{{ $urlOut }}"
+                                     alt="Check Out"
                                      loading="lazy"
-                                     onclick="openLightbox('{{ $checkOutUrl }}', 'Check-Out: {{ addslashes($intern->name) }} — {{ $dateLabel }}')"
-                                     class="w-full h-48 object-cover rounded-2xl border-2 border-rose-200 shadow-md cursor-pointer transition duration-200 group-hover:scale-105 group-hover:shadow-xl group-hover:border-rose-400">
-                                <span class="absolute bottom-2 left-2 bg-rose-600/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-lg shadow">
+                                     onclick="openLightbox('{{ $urlOut }}', 'Check-Out: {{ addslashes($intern->name) }} — {{ $tgl }}')"
+                                     class="w-full h-44 object-cover rounded-2xl shadow-sm border border-gray-200 cursor-pointer
+                                            transition duration-200 group-hover:shadow-md group-hover:border-red-400 group-hover:scale-[1.02]">
+                                <div class="absolute inset-0 rounded-2xl bg-black/0 group-hover:bg-black/5 transition duration-200 pointer-events-none"></div>
+                                <span class="absolute bottom-2 left-2 bg-red-500/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-lg shadow-sm">
                                     CHECK OUT
                                 </span>
                                 @if($attendance->check_out_time)
-                                <span class="absolute top-2 right-2 bg-black/60 text-white text-[11px] font-bold px-2 py-0.5 rounded-lg shadow">
+                                <span class="absolute top-2 right-2 bg-black/50 text-white text-[10px] font-bold px-2 py-0.5 rounded-lg">
                                     {{ \Carbon\Carbon::parse($attendance->check_out_time)->format('H:i') }}
                                 </span>
                                 @endif
                             @else
-                                <div class="w-full h-48 rounded-2xl bg-gray-100 border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-1">
-                                    <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="w-full h-44 rounded-2xl bg-gray-50 border border-dashed border-gray-200 flex flex-col items-center justify-center gap-2">
+                                    <svg class="w-7 h-7 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                     </svg>
-                                    <span class="text-xs text-gray-400 font-semibold text-center">Tidak ada foto<br>check-out</span>
+                                    <span class="text-[10px] text-gray-400 font-semibold text-center leading-tight">Tidak ada<br>foto check-out</span>
                                 </div>
                             @endif
                         </div>
@@ -198,22 +241,29 @@
 
         </div>
         @empty
-        <div class="glass-effect rounded-3xl p-16 text-center shadow border border-white/60">
-            <div class="text-5xl mb-4">📷</div>
-            <p class="text-gray-500 font-semibold text-lg">Belum ada foto absensi</p>
+
+        {{-- Empty State --}}
+        <div class="glass-effect rounded-3xl p-16 text-center shadow-md border border-white/60">
+            <div class="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+            </div>
+            <p class="text-gray-700 font-bold text-base">Belum ada foto absensi</p>
             <p class="text-gray-400 text-sm mt-1">
-                Tidak ada foto absensi peserta magang untuk periode
+                Tidak ada foto absensi untuk periode
                 @if($filterMonth)
-                    <strong>{{ \Carbon\Carbon::createFromFormat('Y-m', $filterMonth)->locale('id')->isoFormat('MMMM YYYY') }}</strong>.
+                    <strong class="text-gray-600">{{ \Carbon\Carbon::createFromFormat('Y-m', $filterMonth)->locale('id')->isoFormat('MMMM YYYY') }}</strong>.
                 @else
                     yang dipilih.
                 @endif
             </p>
             <a href="{{ route('superadmin.attendance-gallery.index') }}"
-               class="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-green-600 hover:bg-green-700 text-white text-sm font-bold transition">
+               class="mt-5 inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-xl shadow-sm transition-colors">
                 Lihat Semua Periode
             </a>
         </div>
+
         @endforelse
 
     </div>
@@ -230,8 +280,7 @@
             document.getElementById('lightbox-img').src = '';
             document.body.style.overflow = '';
         }
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closeLightbox();
-        });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
     </script>
+
 </x-app-layout>
