@@ -75,6 +75,16 @@
                                 <input type="datetime-local" id="check_in_time" name="check_in_time"
                                     value="{{ old('check_in_time', $attendance->check_in_time ? \Carbon\Carbon::parse($attendance->check_in_time)->format('Y-m-d\TH:i') : '') }}"
                                     class="w-full border @error('check_in_time') border-red-300 ring-2 ring-red-100 @else border-gray-200 @enderror bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 rounded-xl px-4 py-2.5 text-sm font-medium transition-all outline-none">
+                                @if($attendance->check_in_photo)
+                                    <div class="mt-2 flex items-center gap-2">
+                                        <a href="{{ route('attendances.photo', ['attendance' => $attendance->id, 'type' => 'check_in']) }}"
+                                           target="_blank"
+                                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold transition-colors">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                            Lihat Foto Check-In ↗
+                                        </a>
+                                    </div>
+                                @endif
                                 @error('check_in_time')
                                     <p class="mt-1.5 text-xs text-red-500">{{ $message }}</p>
                                 @enderror
@@ -87,6 +97,16 @@
                                 <input type="datetime-local" id="check_out_time" name="check_out_time"
                                     value="{{ old('check_out_time', $attendance->check_out_time ? \Carbon\Carbon::parse($attendance->check_out_time)->format('Y-m-d\TH:i') : '') }}"
                                     class="w-full border @error('check_out_time') border-red-300 ring-2 ring-red-100 @else border-gray-200 @enderror bg-gray-50 focus:bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 rounded-xl px-4 py-2.5 text-sm font-medium transition-all outline-none">
+                                @if($attendance->check_out_photo)
+                                    <div class="mt-2 flex items-center gap-2">
+                                        <a href="{{ route('attendances.photo', ['attendance' => $attendance->id, 'type' => 'check_out']) }}"
+                                           target="_blank"
+                                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-bold transition-colors">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                            Lihat Foto Check-Out ↗
+                                        </a>
+                                    </div>
+                                @endif
                                 @error('check_out_time')
                                     <p class="mt-1.5 text-xs text-red-500">{{ $message }}</p>
                                 @enderror
