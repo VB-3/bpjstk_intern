@@ -141,6 +141,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/students/{student}/edit', [\App\Http\Controllers\SuperAdmin\StudentController::class, 'edit'])->name('students.edit');
         Route::patch('/students/todos/{todo}/bpu', [\App\Http\Controllers\SuperAdmin\StudentController::class, 'updateBpu'])->name('students.updateBpu');
 
+        // Galeri Foto Absensi (khusus superadmin dengan akses foto)
+        Route::get('/attendance-gallery', [\App\Http\Controllers\SuperAdmin\AttendanceGalleryController::class, 'index'])->name('attendance-gallery.index');
+
         // Mentor Performance (Rekapitulasi Target & Realisasi) - editable dari dashboard
         Route::post('/mentor-performance', [\App\Http\Controllers\SuperAdmin\MentorPerformanceController::class, 'store'])->name('mentor-performance.store');
         Route::put('/mentor-performance/{performance}', [\App\Http\Controllers\SuperAdmin\MentorPerformanceController::class, 'update'])->name('mentor-performance.update');
